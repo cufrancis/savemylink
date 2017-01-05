@@ -5,15 +5,13 @@ import sys
 sys.path.append("../../../")
 
 from game.Handler.BaseHandler import BaseHandler
+import tornado.web
 
-from sanic.response import html
 from lib.DB import db
 
 class index(BaseHandler):
-    def get(self, request):
-        user = self.getUser(request)
-        print("User:{user}".format(user=user))
-        print(user)
-        template = self.env.get_template('index.html')
+    def get(self):
 
-        return html(template.render(user=user))
+        user = self.getUser()
+
+        self.render('index.html', user=user)

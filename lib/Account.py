@@ -26,6 +26,7 @@ class Account(object):
         result = self.db.r.hget('account:{id}'.format(id=self.id), field)
         #print(self.id)
         #print(result)
+        result = bytes.decode(result)
         return result
         #return self.db.hget(self.key, field)
 
@@ -39,7 +40,7 @@ class Account(object):
             #return "cannot register"
         else:
             if self.db.r.exists('account:email:{email}'.format(email=email)) is False:
-                id = self.db.r.incr('account:count')
+                uid = self.db.r.incr('account:count')
                 userinfo = {
                     'email' :email,
                     'password': password,
@@ -51,10 +52,11 @@ class Account(object):
                     'mobile': ''
                 }
 
-                self.db.r.set('account:email:{email}'.format(email=email), id)
-                self.db.r.sadd('account:userlist', id)
-                self.db.r.hmset('account:{id}'.format(id=id),userinfo)
-                return id
+                self.db.r.set('account:email:{email}'.format(email=email), uid)
+                self.db.r.sadd('account:userlist', uid)
+                self.db.r.hmset('account:{id}'.format(id=uid),userinfo)
+                print(uid)
+                return uid
             else:
                 return -2
                 #return 'mobile has register!'
@@ -90,7 +92,9 @@ class Account(object):
     def _handle(self, field, value=None):
 
         if value is None:
-            return self._get(field)
+            result = self._get(field)
+            result = bytes.decode(result)
+            return result
         else:
             return self._set(field, value)
 
@@ -98,7 +102,7 @@ class Account(object):
         if value is not None:
             self._set('email', value)
         else:
-            return bytes.decode(self._get('email'))
+            return self._get('email')
             #return self._handle('email', value)
 
     def mobile(self, value=None):
@@ -121,8 +125,8 @@ class Account(object):
         else:
             return self.db.r.sadd(key, value)
 
-account = Account(1)
+#account = Account(1)
 
-print(account.password())
+#print(account.password())
 
-print(db.r.keys())
+#print(db.r.keys())

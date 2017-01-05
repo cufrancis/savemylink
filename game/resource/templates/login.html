@@ -3,6 +3,7 @@
 <h1>Login</h1>
 
 <form method="POST">
+    {% raw xsrf_form_html() %}
     mobile:
     <input type="text" name="mobile" value="" /><br />
     password:

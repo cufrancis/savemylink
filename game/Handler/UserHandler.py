@@ -5,58 +5,51 @@ import sys
 sys.path.append('../../')
 
 from game.Handler.BaseHandler import BaseHandler
-from sanic.response import html, text
 
 from lib.Account import Account
 from lib.DB import db
 
 class login(BaseHandler):
-    def get(self, request):
-        #template = self.env.get_template('index.html')
-        return self.render('login.html')
+    def get(self):
+        self.render('login.html')
 
-    def post(self, request):
+    def post(self):
         account = Account()
-        mobile = request.form['mobile'][0]
-        password = request.form['password'][0]
+        mobile = self.get_argument('mobile')
+        password = self.get_argument('password')
         id = account.login(mobile, password)
 
         if id != None:
-            response = text("cookie up in this response")
-            response.cookies['id'] = id
-            response.cookies['id']['path'] = '/'
-            return response
+            self.set_secure_cookie('id', id)
+            self.write("login successful!")
         else:
             return "error"
 
 class register(BaseHandler):
-    def get(self, request):
-        print(request.cookies)
-        return self.render('register.html', title='register')
+    def get(self):
+        self.render('register.html', title='register')
 
-    def post(self, request):
+    def post(self):
         account = Account()
-        email = request.form['mobile'][0]
-        password = request.form['password'][0]
-        id = account.register(email, password)
-        if id >= 0:
+        email = self.get_argument('mobile')
+        password = self.get_argument('password')
+
+        uid = account.register(email, password)
+        self.set_secure_cookie('uid', 'hello')
+
+        if uid != None:
+            self.set_secure_cookie('id', str(uid))
             msg = "register sccessful!"
         else:
             msg = 'register error'
 
-        return text(msg)
+        self.write(msg)
 
 class logout(BaseHandler):
 
-    def get(self, request):
-        print(request.cookies['id'])
-        account_id = request.cookies['id']
-        #response = text("logout successful!")
-        #response.cookies['id'] = None
-        print(db)
-        db.r.srem('account:login:set', account_id)
-        db.r.delete('session:{id}'.format(id=account_id))
-        response = text("login successful!")
-        response.cookies['id'] = None
-        print("logout")
-        return response
+    def get(self):
+        db.r.srem('account:login:set', uid)
+        db.r.delete('session:{id}'.format(id=uid))
+        self.clear_cookie('id')
+
+        self.write("logout successful")

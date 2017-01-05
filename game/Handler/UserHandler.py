@@ -45,3 +45,18 @@ class register(BaseHandler):
             msg = 'register error'
 
         return text(msg)
+
+class logout(BaseHandler):
+
+    def get(self, request):
+        print(request.cookies['id'])
+        account_id = request.cookies['id']
+        #response = text("logout successful!")
+        #response.cookies['id'] = None
+        print(db)
+        db.r.srem('account:login:set', account_id)
+        db.r.delete('session:{id}'.format(id=account_id))
+        response = text("login successful!")
+        response.cookies['id'] = None
+        print("logout")
+        return response

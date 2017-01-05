@@ -13,7 +13,7 @@ class index(BaseHandler):
     def get(self, request):
         user = self.getUser(request)
         print("User:{user}".format(user=user))
-        print(user.email())
+        print(user)
         template = self.env.get_template('index.html')
 
         return html(template.render(user=user))

@@ -16,5 +16,6 @@ import game.Handler.UserHandler as UserHandler
 app.add_route(IndexHandler.index(), '/')
 app.add_route(UserHandler.login(), '/login')
 app.add_route(UserHandler.register(), '/register')
+app.add_route(UserHandler.logout(), '/logout')
 
 app.run(host="0.0.0.0", port=8888, debug=True)

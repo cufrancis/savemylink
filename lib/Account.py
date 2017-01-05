@@ -77,6 +77,8 @@ class Account(object):
                         'time':time.time()
                     }
                     self.db.r.hmset('account:{id}:lastlogin'.format(id=account_id), lastlogin)
+                    # add session key and set expire time is 3600s
+                    self.db.set('session:{id}'.format(id=account_id), account_id, 3600)
                     print("account:login:set")
                     return account_id
                 else:

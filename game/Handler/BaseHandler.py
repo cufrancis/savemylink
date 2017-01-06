@@ -18,6 +18,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         super(BaseHandler, self).__init__(application, request, **kwargs)
         self.db = db
+        self.user = self.getUser()
 
     def get_secure_cookie(self, name, value=None, max_age_days=31, min_version=None):
         result = super(BaseHandler, self).get_secure_cookie(name, value, max_age_days, min_version)
@@ -26,16 +27,13 @@ class BaseHandler(tornado.web.RequestHandler):
         except:
             return result
 
+
     def getUser(self):
         uid = self.get_secure_cookie('id')
-        #uid = bytes.decode(uid)
-        #print(uid)
-        print('cookie_uid')
-        print(uid)
         if uid is not None:
 
-            login_set = self.db.r.sismember('account:login:set', uid)
-            if self.db.r.sismember('account:login:set', uid) is True:
+            login_set = self.db.r.sismember(ACCOUNT_LOGIN, uid)
+            if self.db.r.sismember(ACCOUNT_LOGIN, uid) is True:
                 return Account(uid)
             else:
                 return None

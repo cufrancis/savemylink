@@ -1,8 +1,31 @@
+{% extends "base.html" %}
 
-<title>Web Game</title>
+{%block title%}Web Game{%end%}
+
+{%block content%}
 
 {% if user == None %}
 <a href="/login">Login</a>| <a href="/register">Register</a>
 {% else %}
-Welcome, {{user.email()}} | <a href="/logout">Logout</a>
+Welcome, {{user.email}} | <a href="/logout">Logout</a>
+<br />
+<a href="/link/add">add Link</a>
 {% end %}
+<hr />
+
+<ul class=article-list>
+    {% if len(links) %}
+        {% for link in links %}
+            <li>
+                <div class=article>
+                    <a href="{% raw link['url'] %}">{{link['title']}}</a> ({{link['url']}})<br />
+                    <i>Created_at:{{link['created_at']}} | Author:{{link['author']}} | Visit:{{link['visit']}}</i>
+                </div>
+            </li>
+        {% end %}
+    {%else%}
+        No have
+    {%end%}
+<ul>
+
+{%end%}

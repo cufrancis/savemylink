@@ -9,14 +9,6 @@ from lib.define import *
 
 slat = 'password'
 
-#ACCOUNT_COUNT = 'account:count' # String
-#ACCOUNT_USERLIST = 'account:userlist' # set
-#ACCOUNT_EMAIL = 'account:email:{email}' # String
-#ACCOUNT_LAST_LOGIN = 'account:lastlogin:{uid}' # hash
-#ACCOUNT_LOGIN = 'account:login:set' # set
-#ACCOUNT_AVATARS = 'account:avatars:{uid}'
-#ACCOUNT_USER = 'account:user:{uid}' # hash
-
 
 class Account(object):
 
@@ -26,6 +18,10 @@ class Account(object):
         self.uid = uid
         self.key = ACCOUNT_USER.format(uid=uid)
         self.account_key = ACCOUNT_USER.format(uid=uid)
+
+    def __getattr__(self, field):
+        print("__getattr__:{field}".format(field=field))
+        return self._get(field)
 
     def _get(self, field):
         result = self.db.r.hget(ACCOUNT_USER.format(uid=self.uid), field)
@@ -101,11 +97,11 @@ class Account(object):
         else:
             return self._set(field, value)
 
-    def email(self, value=None):
-        if value is not None:
-            self._set('email', value)
-        else:
-            return self._get('email')
+   # def email(self, value=None):
+    #    if value is not None:
+     #       self._set('email', value)
+      #  else:
+       #     return self._get('email')
             #return self._handle('email', value)
 
     def mobile(self, value=None):

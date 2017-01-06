@@ -1,0 +1,15 @@
+{% extends "../base.html" %}
+
+{%block title%}add link{%end%}
+
+{%block content%}
+<form method="POST">
+    {%raw xsrf_form_html()%}
+    URL:
+    <input type="text" name="url" /><br />
+    Title:
+    <input type="text" name="title" />
+
+    <input type="submit" value="Add" />
+</form>
+{%end%}

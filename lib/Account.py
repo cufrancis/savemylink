@@ -5,30 +5,33 @@ from lib.DB import db
 import hashlib
 import time
 
+from lib.define import *
+
 slat = 'password'
-ACCOUNT_COUNT = 'account:count'
-ACCOUNT_USERLIST = 'account:userlist'
-ACCOUNT_EMAIL = 'account:email:{email}'
-ACCOUNT = 'account:{id}'
+
+#ACCOUNT_COUNT = 'account:count' # String
+#ACCOUNT_USERLIST = 'account:userlist' # set
+#ACCOUNT_EMAIL = 'account:email:{email}' # String
+#ACCOUNT_LAST_LOGIN = 'account:lastlogin:{uid}' # hash
+#ACCOUNT_LOGIN = 'account:login:set' # set
+#ACCOUNT_AVATARS = 'account:avatars:{uid}'
+#ACCOUNT_USER = 'account:user:{uid}' # hash
 
 
 class Account(object):
 
 
-    def __init__(self, account_id=0):
+    def __init__(self, uid=0):
         self.db = db
-        self.id = account_id
-        self.key = ACCOUNT.format(id=self.id)
-        self.account_key = ACCOUNT.format(id=self.id)
+        self.uid = uid
+        self.key = ACCOUNT_USER.format(uid=uid)
+        self.account_key = ACCOUNT_USER.format(uid=uid)
 
     def _get(self, field):
-        #return self.key
-        result = self.db.r.hget('account:{id}'.format(id=self.id), field)
-        #print(self.id)
-        #print(result)
+        result = self.db.r.hget(ACCOUNT_USER.format(uid=self.uid), field)
+
         result = bytes.decode(result)
         return result
-        #return self.db.hget(self.key, field)
 
     def _set(self, field, value):
         return self.db.hset(self.key, field, value)
@@ -39,8 +42,8 @@ class Account(object):
             return -1
             #return "cannot register"
         else:
-            if self.db.r.exists('account:email:{email}'.format(email=email)) is False:
-                uid = self.db.r.incr('account:count')
+            if self.db.r.exists(ACCOUNT_EMAIL.format(email=email)) is False:
+                uid = self.db.r.incr(ACCOUNT_COUNT)
                 userinfo = {
                     'email' :email,
                     'password': password,
@@ -52,9 +55,9 @@ class Account(object):
                     'mobile': ''
                 }
 
-                self.db.r.set('account:email:{email}'.format(email=email), uid)
-                self.db.r.sadd('account:userlist', uid)
-                self.db.r.hmset('account:{id}'.format(id=uid),userinfo)
+                self.db.r.set(ACCOUNT_EMAIL.format(email=email), uid)
+                self.db.r.sadd(ACCOUNT_USERLIST, uid)
+                self.db.r.hmset(ACCOUNT_USER.format(uid=uid),userinfo)
                 print(uid)
                 return uid
             else:
@@ -66,23 +69,23 @@ class Account(object):
             # mobile or password is None
             return -1
         else:
-            if self.db.r.exists('account:email:{email}'.format(email=email)) is True:
+            if self.db.r.exists(ACCOUNT_EMAIL.format(email=email)) is True:
 
-                account_id = self.db.get('account:email:{email}'.format(email=email))
+                uid = self.db.get(ACCOUNT_EMAIL.format(email=email))
 
-                if self.db.hget('account:{id}'.format(id=account_id), 'password') == str.encode(password):
-                    self.db.r.sadd('account:login:set', account_id)
+                if self.db.hget(ACCOUNT_USER.format(uid=uid), 'password') == str.encode(password):
+                    self.db.r.sadd(ACCOUNT_LOGIN, uid)
                     # Session setting
                     #self.db.r.set('account:login:{id}'.format(id=id), '')
                     lastlogin = {
                         'ip':'127.0.0.1',
                         'time':time.time()
                     }
-                    self.db.r.hmset('account:{id}:lastlogin'.format(id=account_id), lastlogin)
+                    self.db.r.hmset(ACCOUNT_LAST_LOGIN.format(uid=uid), lastlogin)
                     # add session key and set expire time is 3600s
-                    self.db.set('session:{id}'.format(id=account_id), account_id, 3600)
-                    print("account:login:set")
-                    return account_id
+                    self.db.set('session:{id}'.format(id=uid), uid, 3600)
+                    print(ACCOUNT_LOGIN)
+                    return uid
                 else:
                     return "password error"
             else:
@@ -118,7 +121,7 @@ class Account(object):
             return self._get('password')
 
     def avatars(self, value=None):
-        key = 'account:{id}:avatars'.format(id=self.id)
+        key = ACCOUNT_AVATARS.format(id=self.id)
 
         if value is None:
             return self.db.r.smembers(key)

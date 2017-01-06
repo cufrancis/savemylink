@@ -11,6 +11,7 @@ import tornado.ioloop
 
 from lib.DB import db
 from lib.Account import Account
+from lib.define import *
 
 class BaseHandler(tornado.web.RequestHandler):
 

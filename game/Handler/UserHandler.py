@@ -9,6 +9,19 @@ from game.Handler.BaseHandler import BaseHandler
 from lib.Account import Account
 from lib.DB import db
 
+class index(BaseHandler):
+    def get(self, uid):
+        user = Account(uid)
+        print(user.email)
+        print("userS")
+        print(user.name)
+
+        print("Links")
+        links = user.links()
+        print(user.links())
+
+        self.render('user/index.html', user=user, links=links)
+
 class login(BaseHandler):
     def get(self):
         self.render('login.html')

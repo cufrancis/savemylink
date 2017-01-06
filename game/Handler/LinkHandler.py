@@ -19,9 +19,9 @@ class create(BaseHandler):
     def post(self):
         url = self.get_argument('url')
         title = self.get_argument('title')
-        
+
         info = {
-            'author':'',
+            'author':self.user.uid,
             'title':title,
             'url':url,
             'created_at':int(time.time()),

@@ -33,7 +33,7 @@ class Link(object):
             tmps['visit'] = int(self.db.r.zscore(LINK_SORT_BYVISIT.format(link_id=key), key))
 
             tmps['created_at'] = datetime.datetime.fromtimestamp(int(tmps['created_at'])).strftime("%Y-%m-%d %H:%M:%S")
-
+            tmps['author_name'] = self.db.r.hget(ACCOUNT_USER.format(uid=tmps['author']), 'email')
             result.append(tmps)
 
         return result
@@ -46,6 +46,7 @@ class Link(object):
         self.db.r.sadd(LINK_ALL, link_id)
         self.db.r.zadd(LINK_SORT_BYTIME.format(link_id=link_id), link_id, int(time.time()))
         self.db.r.zadd(LINK_SORT_BYVISIT.format(link_id=link_id),link_id, 0)
+        self.db.r.sadd(ACCOUNT_LINK.format(uid=info['author']), link_id)
 
 #        print(link_id)
         return link_id

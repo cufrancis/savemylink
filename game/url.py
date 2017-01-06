@@ -14,6 +14,7 @@ url = [
     (r'/login', User.login),
     (r'/register', User.register),
     (r'/logout', User.logout),
+    (r'/user/(\d+)', User.index),
 
     # link
     (r'/link/add', Link.create),

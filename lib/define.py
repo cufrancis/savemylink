@@ -10,7 +10,7 @@ ACCOUNT_LAST_LOGIN = 'account:lastlogin:{uid}' # hash
 ACCOUNT_LOGIN = 'account:login:set' # set
 ACCOUNT_AVATARS = 'account:avatars:{uid}'
 ACCOUNT_USER = 'account:user:{uid}' # hash
-
+ACCOUNT_LINK = 'account:link:{uid}' #Set
 # Link
 LINK_COUNT = 'link:count' # string
 LINK_ALL = 'link:all:set' # set

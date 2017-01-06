@@ -4,6 +4,7 @@
 from lib.DB import db
 import hashlib
 import time
+from lib.util import convert
 
 from lib.define import *
 
@@ -21,16 +22,33 @@ class Account(object):
 
     def __getattr__(self, field):
         print("__getattr__:{field}".format(field=field))
-        return self._get(field)
+        result = self._get(field)
+        if result:
+            return result
+        else:
+            return None
+        #print(result)
 
     def _get(self, field):
         result = self.db.r.hget(ACCOUNT_USER.format(uid=self.uid), field)
-
-        result = bytes.decode(result)
+        if result:
+            result = bytes.decode(result)
         return result
 
     def _set(self, field, value):
         return self.db.hset(self.key, field, value)
+
+    def links(self):
+        print(self.uid)
+        result = self.db.r.smembers(ACCOUNT_LINK.format(uid=self.uid))
+        result = list(result)
+        links = []
+        tmp = []
+        for k in result:
+            tmp.append(bytes.decode(k))
+            links.append(convert(self.db.r.hgetall(LINK.format(link_id=bytes.decode(k)))))
+
+        return links
 
     # register account
     def register(self, email, password):

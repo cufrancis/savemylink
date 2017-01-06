@@ -19,7 +19,7 @@ Welcome, {{user.email}} | <a href="/logout">Logout</a>
             <li>
                 <div class=article>
                     <a href="{% raw link['url'] %}">{{link['title']}}</a> ({{link['url']}})<br />
-                    <i>Created_at:{{link['created_at']}} | Author:{{link['author']}} | Visit:{{link['visit']}}</i>
+                    <i>Created_at:{{link['created_at']}} | Author:{%if link['author']%}<a href="/user/{{ link['author']}}">{{link['author_name']}}</a>{%else%} Anonymous {%end%}| Visit:{{link['visit']}}</i>
                 </div>
             </li>
         {% end %}

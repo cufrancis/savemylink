@@ -8,6 +8,7 @@ from game.Handler.BaseHandler import BaseHandler
 
 from lib.Account import Account
 from lib.DB import db
+from lib.define import *
 
 class index(BaseHandler):
     def get(self, uid):
@@ -30,13 +31,14 @@ class login(BaseHandler):
         account = Account()
         mobile = self.get_argument('mobile')
         password = self.get_argument('password')
-        id = account.login(mobile, password)
+        uid = account.login(mobile, password)
 
-        if id != None:
-            self.set_secure_cookie('id', id)
+        if uid >= 0:
+            print("Hello?")
+            self.set_secure_cookie('uid', str(uid))
             self.write("login successful!")
         else:
-            return "error"
+            self.write("Error")
 
 class register(BaseHandler):
     def get(self):
@@ -48,10 +50,9 @@ class register(BaseHandler):
         password = self.get_argument('password')
 
         uid = account.register(email, password)
-        self.set_secure_cookie('uid', 'hello')
 
-        if uid != None:
-            self.set_secure_cookie('id', str(uid))
+        if uid >= 0:
+            self.set_secure_cookie('uid', str(uid))
             msg = "register sccessful!"
         else:
             msg = 'register error'
@@ -61,8 +62,9 @@ class register(BaseHandler):
 class logout(BaseHandler):
 
     def get(self):
-        db.r.srem('account:login:set', uid)
-        db.r.delete('session:{id}'.format(id=uid))
-        self.clear_cookie('id')
+        uid = self.get_secure_cookie('uid')
+        db.r.srem(ACCOUNT_LOGIN, uid)
+        db.r.delete(SESSION_USER.format(uid=uid))
+        self.clear_cookie('uid')
 
         self.write("logout successful")

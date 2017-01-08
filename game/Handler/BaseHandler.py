@@ -29,11 +29,14 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
     def getUser(self):
-        uid = self.get_secure_cookie('id')
+        uid = self.get_secure_cookie('uid')
+
+        print('uid')
+        print(uid)
         if uid is not None:
 
             login_set = self.db.r.sismember(ACCOUNT_LOGIN, uid)
-            if self.db.r.sismember(ACCOUNT_LOGIN, uid) is True:
+            if self.db.r.sismember(ACCOUNT_LOGIN, uid) is True and self.db.r.exists(SESSION_USER.format(uid=uid)):
                 return Account(uid)
             else:
                 return None

@@ -73,7 +73,7 @@ class Account(object):
                 self.db.r.sadd(ACCOUNT_USERLIST, uid)
                 self.db.r.hmset(ACCOUNT_USER.format(uid=uid),userinfo)
                 print(uid)
-                return uid
+                return int(uid)
             else:
                 return -2
                 #return 'mobile has register!'
@@ -84,6 +84,7 @@ class Account(object):
             return -1
         else:
             if self.db.r.exists(ACCOUNT_EMAIL.format(email=email)) is True:
+                print("True")
 
                 uid = self.db.get(ACCOUNT_EMAIL.format(email=email))
 
@@ -99,12 +100,14 @@ class Account(object):
                     # add session key and set expire time is 3600s
                     self.db.set('session:{id}'.format(id=uid), uid, 3600)
                     print(ACCOUNT_LOGIN)
-                    return uid
+                    return int(uid)
                 else:
-                    return "password error"
+                    return -2
+                    #return "password error"
             else:
                 # no account information
-                return "no have this account"
+                return -3
+                #return "no have this account"
 
     def _handle(self, field, value=None):
 

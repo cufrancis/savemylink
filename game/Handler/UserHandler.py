@@ -9,16 +9,14 @@ from game.Handler.BaseHandler import BaseHandler
 from lib.Account import Account
 from lib.DB import db
 from lib.define import *
+from lib.Error import Error, LoginError
+import time
 
 class index(BaseHandler):
     def get(self, uid):
         user = Account(uid)
-        print(user.email)
-        print("userS")
-        print(user.name)
-
-        print("Links")
         links = user.links()
+
         print(user.links())
 
         self.render('user/index.html', user=user, links=links)
@@ -29,16 +27,40 @@ class login(BaseHandler):
 
     def post(self):
         account = Account()
-        mobile = self.get_argument('mobile')
+        email = self.get_argument('mobile')
         password = self.get_argument('password')
-        uid = account.login(mobile, password)
 
-        if uid >= 0:
-            print("Hello?")
+        try:
+            if email is None:
+                raise LoginError("email is None!")
+            if password is None:
+                raise LoginError("password is None!")
+
+            account_email = ACCOUNT_EMAIL.format(email=email)
+            if self.db.r.exists(account_email) is False:
+                raise LoginError("Email does not exists!")
+            uid = self.db.get(account_email)
+            account_user = ACCOUNT_USER.format(uid=uid)
+            if self.db.hget(account_user, 'password') != password:
+                raise LoginError("Incorrect passord!")
+
+            account_login = ACCOUNT_LOGIN
+            session = SESSION_USER.format(uid=uid)
+            lastlogin = dict(
+                ip="127.0.0.1",
+                time =int(time.time())
+            )
+
+            self.db.r.zadd(account_login, uid, 1)
+            # session setting
+            self.db.set(session, uid, 3600)
+
+            # set secure cookie
             self.set_secure_cookie('uid', str(uid))
-            self.write("login successful!")
+        except LoginError as e:
+            self.write(e.message)
         else:
-            self.write("Error")
+            self.write("Login successful!")
 
 class register(BaseHandler):
     def get(self):
@@ -49,22 +71,42 @@ class register(BaseHandler):
         email = self.get_argument('mobile')
         password = self.get_argument('password')
 
-        uid = account.register(email, password)
+        account_email = ACCOUNT_EMAIL.format(email=email)
+        account_count = ACCOUNT_COUNT
 
-        if uid >= 0:
-            self.set_secure_cookie('uid', str(uid))
-            msg = "register sccessful!"
+        userinfo = dict(
+            email = email,
+            password = password,
+            sex = 'male',
+            age = 18,
+            desc = '',
+            image = '',
+            status = 'open',
+            mobile = ''
+        )
+
+        try:
+            if self.db.r.exists(account_email) is True:
+                raise LoginError("email is exists!")
+
+            uid = self.db.r.incr(account_count)
+
+            account_userlist = ACCOUNT_USERLIST
+            account_user = ACCOUNT_USER.format(uid=uid)
+
+            self.db.r.set(account_email, uid)
+            self.db.r.sadd(account_userlist, uid)
+            self.db.r.hmset(account_user, userinfo)
+        except LoginError as e:
+            self.write(e.value)
         else:
-            msg = 'register error'
-
-        self.write(msg)
+            self.write("Register successful!")
 
 class logout(BaseHandler):
 
     def get(self):
-        uid = self.get_secure_cookie('uid')
-        db.r.srem(ACCOUNT_LOGIN, uid)
-        db.r.delete(SESSION_USER.format(uid=uid))
-        self.clear_cookie('uid')
+        print(self.user.uid)
+        if self.user.logout():
+            self.clear_cookie('uid')
 
         self.write("logout successful")

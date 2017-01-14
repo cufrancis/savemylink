@@ -12,7 +12,7 @@ slat = 'password'
 
 
 class Account(object):
-
+    db = db
 
     def __init__(self, uid=0):
         self.db = db
@@ -22,24 +22,47 @@ class Account(object):
 
     def __getattr__(self, field):
         print("__getattr__:{field}".format(field=field))
-        result = self._get(field)
-        if result:
-            return result
-        else:
-            return None
-        #print(result)
+
+        attributes = ['email','mobile', 'nick_name', 'age', 'sex', 'password', 'desc', 'status', 'avatar']
+
+        if field in attributes:
+            return self._get(field)
 
     def _get(self, field):
-        result = self.db.r.hget(ACCOUNT_USER.format(uid=self.uid), field)
-        if result:
-            result = bytes.decode(result)
+        key = ACCOUNT_USER.format(uid=self.uid)
+        result = self.db.hget(key, field)
+
         return result
 
     def _set(self, field, value):
         return self.db.hset(self.key, field, value)
 
-    def links(self):
+    @classmethod
+    def isLogin(cls, uid=0):
+        """
+        is login
+        account:login:set (zset)
+        check session:{id}
+        """
+        session_user = SESSION_USER.format(uid=uid)
+        if cls.db.r.exists(session_user):
+            return True
+        else:
+            return False
+
+    def logout(self):
         print(self.uid)
+        account_login = ACCOUNT_LOGIN
+        session_user = SESSION_USER.format(uid=self.uid)
+
+        try:
+            self.db.r.zrem(account_login, self.uid)
+            self.db.r.delete(session_user)
+            return True
+        except:
+            return False
+
+    def links(self):
         result = self.db.r.smembers(ACCOUNT_LINK.format(uid=self.uid))
         result = list(result)
         links = []
@@ -50,65 +73,6 @@ class Account(object):
 
         return links
 
-    # register account
-    def register(self, email, password):
-        if email is None or password is None:
-            return -1
-            #return "cannot register"
-        else:
-            if self.db.r.exists(ACCOUNT_EMAIL.format(email=email)) is False:
-                uid = self.db.r.incr(ACCOUNT_COUNT)
-                userinfo = {
-                    'email' :email,
-                    'password': password,
-                    'sex' : 'male',
-                    'age' : 18,
-                    'desc': '',
-                    'image': '',
-                    'status': 'open',
-                    'mobile': ''
-                }
-
-                self.db.r.set(ACCOUNT_EMAIL.format(email=email), uid)
-                self.db.r.sadd(ACCOUNT_USERLIST, uid)
-                self.db.r.hmset(ACCOUNT_USER.format(uid=uid),userinfo)
-                print(uid)
-                return int(uid)
-            else:
-                return -2
-                #return 'mobile has register!'
-
-    def login(self, email, password):
-        if email is None or password is None:
-            # mobile or password is None
-            return -1
-        else:
-            if self.db.r.exists(ACCOUNT_EMAIL.format(email=email)) is True:
-                print("True")
-
-                uid = self.db.get(ACCOUNT_EMAIL.format(email=email))
-
-                if self.db.hget(ACCOUNT_USER.format(uid=uid), 'password') == str.encode(password):
-                    self.db.r.sadd(ACCOUNT_LOGIN, uid)
-                    # Session setting
-                    #self.db.r.set('account:login:{id}'.format(id=id), '')
-                    lastlogin = {
-                        'ip':'127.0.0.1',
-                        'time':time.time()
-                    }
-                    self.db.r.hmset(ACCOUNT_LAST_LOGIN.format(uid=uid), lastlogin)
-                    # add session key and set expire time is 3600s
-                    self.db.set('session:{id}'.format(id=uid), uid, 3600)
-                    print(ACCOUNT_LOGIN)
-                    return int(uid)
-                else:
-                    return -2
-                    #return "password error"
-            else:
-                # no account information
-                return -3
-                #return "no have this account"
-
     def _handle(self, field, value=None):
 
         if value is None:
@@ -118,21 +82,11 @@ class Account(object):
         else:
             return self._set(field, value)
 
-   # def email(self, value=None):
-    #    if value is not None:
-     #       self._set('email', value)
-      #  else:
-       #     return self._get('email')
-            #return self._handle('email', value)
-
     def mobile(self, value=None):
         return self._handle('mobile', value)
 
     def password(self, value=None):
         if value is not None:
-            #md5 = hashlib.md5()
-            #md5.update(str.encode(value+slat))
-            #value = md5.digest()
             self._set('password', value)
         else:
             return self._get('password')
@@ -144,9 +98,3 @@ class Account(object):
             return self.db.r.smembers(key)
         else:
             return self.db.r.sadd(key, value)
-
-#account = Account(1)
-
-#print(account.password())
-
-#print(db.r.keys())

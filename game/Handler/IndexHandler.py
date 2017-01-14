@@ -13,15 +13,20 @@ from lib.Account import Account
 
 class index(BaseHandler):
     def get(self):
-        link = Link()
+        link = Link(1)
         print("User")
         print(self.user)
+        u1 = Account(1)
+        print(u1.email)
 
-        print(link)
+        print(link.comments)
+        print("++++++++")
+        print(link.author.password)
+        print("++++++++")
 
         comments = []
-        links_content = link.getAll()
+        links_content = Link().getAll()
 
-        print(links_content)
+ #       print(links_content)
 
         self.render('index.html',user=self.user, links=links_content)

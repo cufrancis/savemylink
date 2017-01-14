@@ -8,27 +8,52 @@ class DB(object):
         self.pool = redis.ConnectionPool(host=host, port=port, db=db)
         self.r = redis.Redis(connection_pool=self.pool)
 
+    def isInside(self):
+        pass
+
     def set(self, key, value, outtime=0):
         result = self.r.set(key, value)
         if outtime != 0:
             self.r.expire(key, outtime)
+
         return result
 
     def hset(self, key, field, value):
-        result = self.r.hset(key, field, value)
-        print(type(result))
+        try:
+            result = self.r.hset(key, field, value)
+            return result
+        except:
+            return 0
 
-    def hget(self, key, field):
+    def hget(self, key, field, convert=True):
         result = self.r.hget(key, field)
-        #result = bytes.decode(result)
-        return result
 
-    def get(self, key):
-        result = self.r.get(key)
-        return bytes.decode(result)
+        if convert:
+            try:
+                return bytes.decode(result)
+            except:
+                return None
+
+    def get(self, key, convert=True):
+        if convert:
+            try:
+                result = self.r.get(key)
+                return bytes.decode(result)
+            except:
+                return None
 
     def flushdb(self):
-        return self.r.flushdb()
+        pass
+        #return self.r.flushdb()
+
+    def _bytes2str(self, byte, doit=True):
+        if not isinstance(byte, bytes):
+            return byte
+
+        if doit:
+            return bytes.decode(byte)
+        else:
+            return byte
 
 db = DB(host = 'localhost', port = 6379)
 

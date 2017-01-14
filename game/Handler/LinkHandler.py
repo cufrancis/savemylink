@@ -27,6 +27,7 @@ class create(BaseHandler):
             'created_at':int(time.time()),
             'updated_at':int(time.time())
         }
+
         link = Link()
         result = link.add(info)
 

@@ -1,0 +1,23 @@
+{% extends "../base.html" %}
+
+{%block title%}Reply{%end%}
+
+{%block content%}
+    <p>{{comment.author.email}} {{ago(comment.created_at)}} | parent | on:<a href="{% raw link.url %}">{{link.title}}</a> </p>
+        {{comment.content}}
+        <br />
+        <br />
+    {% if current_user %}
+    <form method="POST">
+        {% raw xsrf_form_html() %}
+        <input type="hidden" name="parent" value="{{comment.cid}}">
+        <input type="hidden" name="lid" value="{{link.lid}}" >
+        <textarea name="text" rows="6" cols="60"></textarea>
+        <br />
+        <br />
+        <input type="submit" value="add comment">
+    </form>
+    {%else%}
+        <a href="/login">login</a> or <a href="/register">register</a> to comment.
+    {%end%}
+{%end%}

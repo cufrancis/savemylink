@@ -1,0 +1,12 @@
+{%block content%}
+    <p>Username:{{user.name}}</p>
+    <p>Email: {{user.email}}</p>
+    <p></p>
+    <ul>
+        {%if links%}
+            {% for link in links %}
+            <li><a href="{{link['url']}}">{{link['title']}}</a> ({{link['url']}})</li>
+            {%end%}
+        {%end%}
+    </ul>
+{%end%}

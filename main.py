@@ -11,11 +11,11 @@ import tornado.web
 #app = Sanic(__name__)
 
 
-import game.Handler.IndexHandler as Index
-import game.Handler.UserHandler as User
+import app.Handler.IndexHandler as Index
+import app.Handler.UserHandler as User
 
-from game.url import url
-from game.config import config
+from app.url import url
+from app.config import config
 
 def make_app():
     return tornado.web.Application(
@@ -24,14 +24,6 @@ def make_app():
     )
 
 if __name__ == "__main__":
-    app = make_app()
-    app.listen(8888)
+    apps = make_app()
+    apps.listen(8888)
     tornado.ioloop.IOLoop.current().start()
-
-
-#app.add_route(IndexHandler.index(), '/')
-#app.add_route(UserHandler.login(), '/login')
-#app.add_route(UserHandler.register(), '/register')
-#app.add_route(UserHandler.logout(), '/logout')
-
-#app.run(host="0.0.0.0", port=8888, debug=True)

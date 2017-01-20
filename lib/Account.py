@@ -7,9 +7,16 @@ import time
 from lib.util import convert
 
 from lib.define import *
+import logging
+LEVELS = {
+    'debug':logging.DEBUG,
+    'info':logging.INFO,
+    'warning':logging.WARNING,
+    'error':logging.ERROR,
+    'critical':logging.CRITICAL
+}
 
 slat = 'password'
-
 
 class Account(object):
     db = db
@@ -21,21 +28,33 @@ class Account(object):
         self.account_key = ACCOUNT_USER.format(uid=uid)
 
     def __getattr__(self, field):
-        print("__getattr__:{field}".format(field=field))
+        print("Account.__getattr__.{field}".format(field=field))
 
         attributes = ['email','mobile', 'nick_name', 'age', 'sex', 'password', 'desc', 'status', 'avatar']
 
         if field in attributes:
+#            if self._get(fied)
             return self._get(field)
 
     def _get(self, field):
         key = ACCOUNT_USER.format(uid=self.uid)
-        result = self.db.hget(key, field)
 
+        result = self.db.hget(key, field)
         return result
 
     def _set(self, field, value):
         return self.db.hset(self.key, field, value)
+
+    def isAdmin(self):
+        # test admin data start
+        self.db.r.sadd(ADMIN, 1)
+        #test admin data end
+
+        if self.db.r.sismember(ADMIN, self.uid):
+            return True
+        else:
+            return False
+
 
     @classmethod
     def isLogin(cls, uid=0):
@@ -69,7 +88,7 @@ class Account(object):
         tmp = []
         for k in result:
             tmp.append(bytes.decode(k))
-            links.append(convert(self.db.r.hgetall(LINK.format(link_id=bytes.decode(k)))))
+            links.append(convert(self.db.r.hgetall(LINK.format(lid=bytes.decode(k)))))
 
         return links
 
@@ -85,11 +104,11 @@ class Account(object):
     def mobile(self, value=None):
         return self._handle('mobile', value)
 
-    def password(self, value=None):
-        if value is not None:
-            self._set('password', value)
-        else:
-            return self._get('password')
+#    def password(self, value=None):
+#        if value is not None:
+#            self._set('password', value)
+#        else:
+#            return self._get('password')
 
     def avatars(self, value=None):
         key = ACCOUNT_AVATARS.format(id=self.id)
@@ -98,3 +117,7 @@ class Account(object):
             return self.db.r.smembers(key)
         else:
             return self.db.r.sadd(key, value)
+
+
+def test_aswer():
+    assert(Account(1).nickname)

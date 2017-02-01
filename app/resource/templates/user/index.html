@@ -1,12 +1,17 @@
+{%extends "layout.html"%}
+
 {%block content%}
-    <p>Username:{{user.name}}</p>
+    <p>Username:{{user.nickname}}</p>
     <p>Email: {{user.email}}</p>
-    <p></p>
+    <p>Sex: {{user.sex}}</p>
+    <p>我发布的连接</p>
     <ul>
         {%if links%}
             {% for link in links %}
             <li><a href="{{link.get('url')}}">{{link.get('title')}}</a> ({{link.get('url')}})</li>
             {%end%}
+        {% else %}
+            暂无
         {%end%}
     </ul>
 {%end%}

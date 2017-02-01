@@ -76,6 +76,10 @@ class Link(object):
 
         return result
 
+    @property
+    def comments(self):
+        return self._comments()
+
     def _author(self):
         return Account(self.author_id)
 

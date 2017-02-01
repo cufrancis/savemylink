@@ -1,34 +1,25 @@
+{%extends "layout.html"%}
+
 {%block content%}
 
-    {# {% if user == None %}
-    <a href="/login">Login</a>| <a href="/register">Register</a>
-    {% else %}
-    Welcome, {{user.email}} |<a href="/user/{{user.uid}}/favourite">Favourite</a>| <a href="/logout">Logout</a>
-    {% if user.isAdmin() %}
-    <a href='/admin'>Admin</a>
-    {% end %}
-    <br />
-    <a href="/link/add">add Link</a>
-    {% end %}#}
-    <hr />
+    <a href="/link/add" class="btn btn-primary btn-lg" role="button">添加我的链接</a>
 
-    <ul class=article-list>
+    <div class="article-list" style="height: 30px;">
         {% if len(links) %}
             {% for link in links %}
-                <li>
-                    <div class=article>
-                        <a href="{% raw link.url %}">{{link.title}}</a> ({{link.url}})<a href="/user/favourite/add/{{link.lid}}">Add to favourite</a><br />
-                        <i>Created_at:{{link.created_at}}|
-                            Author:{%if link.author%}<a href="/user/{{ link.author.uid}}">{{link.author.nickname}}</a>
-                            {%else%} Anonymous {%end%} |
-                            Visit:{{link.visit}} |
-                            <a href="/link/{{link.lid}}">{{link.num_comments}} comments</i>
-                            </div>
-                </li>
+            <div class="row">
+                <div class="row col-sm-12 post-container" style="border-bottom: 1px dashed #cacaca;padding-bottom: 15px;margin-left: 18px;">
+                    <h4 class="post-title">up 0 down |
+                        <a href="{% raw link.url %}">{{link.title}}</a>({{link.url}})</h4>
+                    <div class="meta-box">
+                        <span class="post-info"><a href="/user/{{link.author.uid}}">{{link.author.nickname}}</a> by：{{link.created_at}} | <a href="/link/{{link.lid}}">{{ len(link.comments) }} comments</a></span>
+                    </div>
+                </div>
+            </div>
             {% end %}
-        {%else%}
+        {% else %}
             No have
         {%end%}
-    <ul>
+    </div>
 
 {%end%}

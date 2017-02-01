@@ -43,6 +43,10 @@ url = [
     (r'/user/check/nickname', User.check_nickname),
     (r'/user/check/email', User.check_email),
 
+    (r'/link/check/url', Link.check_url),
+
+    (r'/ajax/get/title', Link.get_title),
+
     # admin.link
     #(r'/admin/link/(\d+)', Link.index)
 ]

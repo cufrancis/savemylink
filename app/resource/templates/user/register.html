@@ -1,16 +1,3 @@
-{# {% block content %}
-
-<form method="POST">
-    {% raw xsrf_form_html() %}
-    Mobile:
-    <input type="text" name="mobile" value="" /><br />
-    password:
-    <input type="text" name="password" value="" />
-    <input type="submit" value="register"/>
-</form>
-<p>Have account? going to <a href="/login">login</a></p>
-{% end %}#}
-
 {% extends "layout.html" %}
 
 {% block css %}
@@ -108,7 +95,6 @@
                                     // 可以禁用输入框，这里暂时隐藏表单
                                     $("#register-form").hide()
                                     // 延时跳转
-                                    // setTimeout(window.location.href='/',300000);
                                     $("head").append('<meta http-equiv="refresh" content="3;url=/" /> ')
 
                                 }else {

@@ -4,7 +4,7 @@
 from lib.DB import db
 import hashlib
 import time
-from lib.util import convert
+from lib.util.convert import convert
 from lib.Error import LoginError
 
 from lib.define import *
@@ -33,6 +33,7 @@ class Account(object):
         self.uid = uid
         self.key = ACCOUNT_USER.format(uid=uid)
         self.account_key = ACCOUNT_USER.format(uid=uid)
+        #ACCOUNT_USER.format(uid=self.uid)
 
     def favourites(self):
 
@@ -61,7 +62,7 @@ class Account(object):
     def __getattr__(self, field):
         print("Account.__getattr__.{field}".format(field=field))
 
-        attributes = ['email','mobile', 'nick_name', 'age', 'sex', 'password', 'desc', 'status', 'avatar']
+        attributes = ['email','mobile', 'nick_name', 'age',  'password', 'desc', 'status', 'avatar']
 
         if field in attributes:
 #            if self._get(fied)
@@ -75,6 +76,14 @@ class Account(object):
 
     def _set(self, field, value):
         return self.db.hset(self.key, field, value)
+
+    @property
+    def nickname(self):
+        return self.db.r.hget(self.account_key, 'nickname')
+
+    @property
+    def sex(self):
+        return self.db.r.hget(self.account_key, 'sex')
 
     def isAdmin(self):
         # test admin data start

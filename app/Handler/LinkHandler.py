@@ -98,6 +98,40 @@ class create(BaseHandler):
             self.db.r.zadd(link_sort_byvisit, lid, 0)
             self.db.r.sadd(account_link, lid)
         except :
-            self.write("Error............")
+            self.write_json(1, "Some error")
+            # self.write("Error............")
         else:
-            self.write("Created successful!")
+            self.write_json(0, "created successful")
+            # self.write("Created successful!")
+
+class check_url(BaseHandler):
+
+    def post(self):
+        url = self.get_argument('url')
+
+        if len(url) <= 0:
+            self.write_json(1, "URL 不能为空")
+
+        self.write_json(0, "验证通过")
+
+class get_title(BaseHandler):
+
+    def post(self):
+        url = self.get_argument('url')
+
+        try:
+            from bs4 import BeautifulSoup
+            import requests
+            r = requests.get(url, timeout=2)
+            soup = BeautifulSoup(r.text,"html.parser")
+        except:
+            self.write_json("")
+        else:
+            self.write_json(soup.title.string)
+
+
+        # print(soup.title.string)
+        # if len(soup.title.string) > 0:
+        #     self.write_json(soup.title.string)
+        # else:
+        #     self.write_json('')

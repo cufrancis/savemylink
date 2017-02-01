@@ -1,6 +1,6 @@
 {% block content %}
     <p><a href="{% raw link.url %}">{{ link.title }}</a>(<i>{{ link.url }}</i>)</p>
-    <p>{{ ago(link.created_at) }} by {{link.author.email}} | {{ link.num_comments }} comments|</p>
+    <p>{{ ago(link.created_at) }} by {{link.author.email}} | {{ link.num_comments }} comments|<a href="/user/favourite/add/{{link.lid}}">Add to favourite</a></p>
     <hr />
     {% if current_user %}
     <form action="/link/{{link.lid}}" method="POST">

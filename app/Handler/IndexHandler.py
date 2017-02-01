@@ -17,9 +17,4 @@ class index(BaseHandler):
     def get(self):
         links = Link.all()
 
-        #print(self.user.isAdmin())
-        #data = json.load(links)
-        #self.write(data)
-        self.render_pjax("index.html", user=self.user, links=links)
-
-        #self.render('index.html',user=self.user, links=links)
+        self.render("index.html", user=self.user, links=links)

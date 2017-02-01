@@ -17,14 +17,14 @@ from lib.Link import Link
 class index(BaseHandler):
     def get(self, uid):
 
-        try:
-            user = Account(uid)
-            links = user.links()
-        except NotExistsError as e:
-            self.write("user Not exists!")
+        # try:
+        user = Account(uid)
+        links = user.links()
+        # except NotExistsError as e:
+        #     self.write("user Not exists!")
 
-        print(user)
-        print(user.links())
+        # print(user)
+        # print(user.links())
 
         self.render('user/index.html', user=user, links=links)
 

@@ -5,9 +5,12 @@ from lib.DB import db
 import hashlib
 import time
 from lib.util import convert
+from lib.Error import LoginError
 
 from lib.define import *
+from lib.Favourite import Favourite
 import logging
+
 LEVELS = {
     'debug':logging.DEBUG,
     'info':logging.INFO,
@@ -22,10 +25,38 @@ class Account(object):
     db = db
 
     def __init__(self, uid=0):
+
+        #if not isinstance(uid, int):
+        #    raise TypeError('Bad operand type')
+
         self.db = db
         self.uid = uid
         self.key = ACCOUNT_USER.format(uid=uid)
         self.account_key = ACCOUNT_USER.format(uid=uid)
+
+    def favourites(self):
+
+        account_favourite = ACCOUNT_FAVOURITE.format(uid=self.uid)
+
+        tmp = self.db.smembers(account_favourite)
+        result = []
+
+        #print("TMP ===============")
+        #print(tmp)
+
+        for k in tmp:
+            result.append(Favourite(k))
+
+        return result
+
+        #print(result)
+        #result = self.db.r.hget()
+
+    # add favourite id to user favourite table
+    # fid to account:{id}:favourite|(set)
+    def add_favourite(self, fid):
+        account_favourite = ACCOUNT_FAVOURITE.format(uid=self.uid)
+        self.db.r.sadd(account_favourite, fid)
 
     def __getattr__(self, field):
         print("Account.__getattr__.{field}".format(field=field))
@@ -55,6 +86,66 @@ class Account(object):
         else:
             return False
 
+    @classmethod
+    def login(cls, email, password):
+        print("Account.login...........")
+        account = Account()
+        email = email
+        password = password
+
+        if email is None:
+            raise LoginError("email is None!")
+        if password is None:
+            raise LoginError("password is None!")
+
+        account_email = ACCOUNT_EMAIL.format(email=email)
+        if cls.db.r.exists(account_email) is False:
+            raise LoginError("Email does not exists!")
+
+        uid = cls.db.get(account_email)
+        account_user = ACCOUNT_USER.format(uid=uid)
+        if cls.db.hget(account_user, 'password') != password:
+            raise LoginError("Incorrect passord!")
+
+        account_login = ACCOUNT_LOGIN
+        session = SESSION_USER.format(uid=uid)
+        lastlogin = dict(
+            ip="127.0.0.1",
+            time =int(time.time())
+        )
+
+        cls.db.r.zadd(account_login, uid, 1)
+        # session setting
+        cls.db.set(session, uid, 3600)
+
+        return uid
+
+    @classmethod
+    def register(cls, userinfo):
+        """
+        successful return uid, failed return 0
+        """
+        account_email = ACCOUNT_EMAIL.format(email=userinfo.get('email'))
+        account_count = ACCOUNT_COUNT
+        nickname_set = NICKNAME
+        email_set = EMAIL
+        uid = 0
+
+        if cls.db.r.exists(account_email) is True:
+            raise LoginError("email is exists!")
+
+        uid = cls.db.r.incr(account_count)
+
+        account_userlist = ACCOUNT_USERLIST
+        account_user = ACCOUNT_USER.format(uid=uid)
+
+        cls.db.r.set(account_email, uid)
+        cls.db.r.sadd(account_userlist, uid)
+        cls.db.r.hmset(account_user, userinfo)
+        cls.db.r.sadd(nickname_set, userinfo.get('nickname'))
+        cls.db.r.sadd(email_set, userinfo.get('email'))
+
+        return uid
 
     @classmethod
     def isLogin(cls, uid=0):
@@ -70,7 +161,6 @@ class Account(object):
             return False
 
     def logout(self):
-        print(self.uid)
         account_login = ACCOUNT_LOGIN
         session_user = SESSION_USER.format(uid=self.uid)
 
@@ -117,6 +207,7 @@ class Account(object):
             return self.db.r.smembers(key)
         else:
             return self.db.r.sadd(key, value)
+
 
 
 def test_aswer():

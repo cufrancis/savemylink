@@ -1,0 +1,40 @@
+{% block content %}
+    <p><a href="{% raw link.url %}">{{ link.title }}</a>(<i>{{ link.url }}</i>)</p>
+    <p>{{ ago(link.created_at) }} by {{link.author.email}} | {{ link.num_comments }} comments|</p>
+    <hr />
+    {% if current_user %}
+    <form action="/link/{{link.lid}}" method="POST">
+        {% raw xsrf_form_html() %}
+        <input type="hidden" name="parent" value="0">
+        <textarea name="text" rows="6" cols="60"></textarea>
+        <br />
+        <br />
+        <input type="submit" value="add comment">
+    </form>
+    {%else%}
+        <a href="/login">login</a> or <a href="/register">register</a> to comment.
+    {%end%}
+    {% for comment in link.comments %}
+        <p><i>{{comment.author.email}} created by {{ago(comment.created_at)}}</i></p>
+        {{comment.content}}<br /><br />
+        {% if comment.reply %}
+            {% for key in comment.reply %}
+                <div class=reply>
+                    <a href="/user/{{key.author.uid}}">{{key.author.email}}</a> created at {{ago(key.created_at)}}
+                    <p>{{ key.content }}</p>
+                    <p><a href="/comment/{{key.cid}}/reply">Reply</a></p>
+
+                    {% if key.reply %}
+                        {% for k in key.reply %}
+                        <div clas="reply">
+                            <a href="/user/{{key.author.uid}}">{{key.author.email}}</a> created at {{ago(key.created_at)}}
+                            <p>{{ key.content }}</p>
+                    </div>
+                        {% end %}
+                    {%end%}
+                </div>
+            {% end %}
+        <a href="/comment/{{comment.cid}}/reply">reply</a>
+        {% end %}
+    {% end %}
+{% end %}

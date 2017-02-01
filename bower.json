@@ -1,0 +1,25 @@
+{
+  "name": "savemylink",
+  "homepage": "https://github.com/cufrancis/savemylink",
+  "authors": [
+    "llnhhy <llnhhy.com@gmail.com>"
+  ],
+  "description": "",
+  "main": "main.py",
+  "keywords": [
+    "savemylink"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/resource/static/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "remodal": "^1.1.1",
+    "font-awesome": "^4.7.0"
+  }
+}

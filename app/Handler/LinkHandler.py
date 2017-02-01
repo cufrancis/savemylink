@@ -13,6 +13,7 @@ from lib.Link import Link
 import time
 from lib.define import *
 from lib.Account import Account
+from lib.Error import PermissionError
 
 class index(BaseHandler):
     def get(self, lid):
@@ -52,8 +53,16 @@ class index(BaseHandler):
 
 class delete(BaseHandler):
     @tornado.web.authenticated
-    def get(self):
-        self.write("link.delete")
+    def get(self, lid):
+        try:
+            if self.user == None or not self.user.isAdmin():
+                raise PermissionError("No admin")
+            result = Link.delete(lid)
+        except PermissionError as e:
+            print(e)
+            self.write(e.message)
+        else:
+            print(result)
 
 class create(BaseHandler):
     @tornado.web.authenticated

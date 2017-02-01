@@ -1,0 +1,16 @@
+{%block content %}
+    <a href="/">Index</a>
+    <h1>Favourite</h1>
+
+    {% for n,link in enumerate(links) %}
+
+        {{n+1}} <a href="{{link.url}}">{{link.title}}</a><br />
+    {% end %}
+
+{%end%}
+
+
+    {%block footer%}
+    <br />
+    <a href="/">Index</a>
+    {%end%}

@@ -21,10 +21,6 @@ class Link(object):
         pass
 
     @classmethod
-    def delete(self, lid=0):
-        pass
-
-    @classmethod
     def save(self):
         pass
 
@@ -52,6 +48,22 @@ class Link(object):
             links.append(Link(lid))
 
         return links
+
+    @classmethod
+    def delete(cls, lid):
+
+        try:
+            link = Link(lid)
+
+            cls.db.r.delete(LINK.format(lid=lid))
+            cls.db.r.srem(LINK_ALL, lid)
+            cls.db.r.zrem(LINK_SORT_BYTIME.format(lid=lid), lid)
+            cls.db.r.zrem(LINK_SORT_BYVISIT.format(lid=lid), lid)
+            cls.db.r.srem(ACCOUNT_LINK.format(uid=link.author_id), lid)
+        except:
+            return False
+        else:
+            return True
 
     # return all comments
     def _comments(self):

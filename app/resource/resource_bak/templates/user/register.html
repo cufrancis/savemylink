@@ -1,0 +1,12 @@
+{% block content %}
+
+<form method="POST">
+    {% raw xsrf_form_html() %}
+    Mobile:
+    <input type="text" name="mobile" value="" /><br />
+    password:
+    <input type="text" name="password" value="" />
+    <input type="submit" value="register"/>
+</form>
+<p>Have account? going to <a href="/login">login</a></p>
+{% end %}

@@ -1,12 +1,15 @@
 {%block content%}
 
-    {% if user == None %}
+    {# {% if user == None %}
     <a href="/login">Login</a>| <a href="/register">Register</a>
     {% else %}
-    Welcome, {{user.email}} | <a href="/logout">Logout</a>
+    Welcome, {{user.email}} |<a href="/user/{{user.uid}}/favourite">Favourite</a>| <a href="/logout">Logout</a>
+    {% if user.isAdmin() %}
+    <a href='/admin'>Admin</a>
+    {% end %}
     <br />
     <a href="/link/add">add Link</a>
-    {% end %}
+    {% end %}#}
     <hr />
 
     <ul class=article-list>
@@ -14,7 +17,7 @@
             {% for link in links %}
                 <li>
                     <div class=article>
-                        <a href="{% raw link.url %}">{{link.title}}</a> ({{link.url}})<br />
+                        <a href="{% raw link.url %}">{{link.title}}</a> ({{link.url}})<a href="/user/favourite/add/{{link.lid}}">Add to favourite</a><br />
                         <i>Created_at:{{link.created_at}}|
                             Author:{%if link.author%}<a href="/user/{{ link.author.uid}}">{{link.author.nickname}}</a>
                             {%else%} Anonymous {%end%} |

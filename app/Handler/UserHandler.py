@@ -11,71 +11,59 @@ from lib.DB import db
 from lib.define import *
 from lib.Error import Error, LoginError
 import time
+import tornado.web
+from lib.Link import Link
 
 class index(BaseHandler):
     def get(self, uid):
-        user = Account(uid)
-        links = user.links()
 
+        try:
+            user = Account(uid)
+            links = user.links()
+        except NotExistsError as e:
+            self.write("user Not exists!")
+
+        print(user)
         print(user.links())
 
-        self.render_pjax('user/index.html', user=user, links=links)
+        self.render('user/index.html', user=user, links=links)
 
 class login(BaseHandler):
     def get(self):
-        self.render_pjax('login.html')
+        self.render('user/login.html')
 
     def post(self):
-        account = Account()
         email = self.get_argument('mobile')
         password = self.get_argument('password')
 
+        print("email")
+        print(email)
+
         try:
-            if email is None:
-                raise LoginError("email is None!")
-            if password is None:
-                raise LoginError("password is None!")
-
-            account_email = ACCOUNT_EMAIL.format(email=email)
-            if self.db.r.exists(account_email) is False:
-                raise LoginError("Email does not exists!")
-            uid = self.db.get(account_email)
-            account_user = ACCOUNT_USER.format(uid=uid)
-            if self.db.hget(account_user, 'password') != password:
-                raise LoginError("Incorrect passord!")
-
-            account_login = ACCOUNT_LOGIN
-            session = SESSION_USER.format(uid=uid)
-            lastlogin = dict(
-                ip="127.0.0.1",
-                time =int(time.time())
-            )
-
-            self.db.r.zadd(account_login, uid, 1)
-            # session setting
-            self.db.set(session, uid, 3600)
-
-            # set secure cookie
+            uid = Account.login(email, password)
             self.set_secure_cookie('uid', str(uid))
         except LoginError as e:
             self.write(e.message)
         else:
-            self.write("Login successful!")
+            self.redirect('/')
+
+    def checkEmail(self):
+        pass
 
 class register(BaseHandler):
     def get(self):
-        self.render_pjax('register.html', title='register')
+        self.render('user/register.html', title='register')
 
     def post(self):
-        account = Account()
-        email = self.get_argument('mobile')
+        email = self.get_argument('email')
         password = self.get_argument('password')
+        nickname = self.get_argument('nickname')
 
-        account_email = ACCOUNT_EMAIL.format(email=email)
-        account_count = ACCOUNT_COUNT
+        # self.write(email)
 
         userinfo = dict(
             email = email,
+            nickname = nickname,
             password = password,
             sex = 'male',
             age = 18,
@@ -84,29 +72,85 @@ class register(BaseHandler):
             status = 'open',
             mobile = ''
         )
-
         try:
-            if self.db.r.exists(account_email) is True:
-                raise LoginError("email is exists!")
-
-            uid = self.db.r.incr(account_count)
-
-            account_userlist = ACCOUNT_USERLIST
-            account_user = ACCOUNT_USER.format(uid=uid)
-
-            self.db.r.set(account_email, uid)
-            self.db.r.sadd(account_userlist, uid)
-            self.db.r.hmset(account_user, userinfo)
+            uid = Account.register(userinfo)
         except LoginError as e:
-            self.write(e.value)
+            self.write_json(1, e.message)
+            # self.write(e.message)
         else:
-            self.write("Register successful!")
+            try:
+                uid = Account.login(email, password)
+                self.set_secure_cookie('uid', str(uid))
+            except LoginError as e:
+                self.write_json(1, e.message)
+                # self.write(e.message)
+            else:
+                self.write_json(0, "注册成功！")
+                # self.redirect('/')
+
+class favourite(BaseHandler):
+    #@tornado.web.authenticated
+    def get(self, uid):
+        # show user favourite (alls), need login
+
+        user = self.user
+
+        if isinstance(uid, int):
+            user = Account(uid)
+
+        self.render("user/favourite.html", user=user)
+
+class add_favourite(BaseHandler):
+
+    @tornado.web.authenticated
+    def get(self, lid):
+        #lid = int(lid)
+        link = Link(lid)
+        favourites = self.user.favourites()
+
+        self.render("user/add_favourite.html", favourites=favourites, link=link)
 
 class logout(BaseHandler):
 
     def get(self):
-        print(self.user.uid)
         if self.user.logout():
             self.clear_cookie('uid')
 
-        self.write("logout successful")
+        self.redirect("/")
+
+class check_nickname(BaseHandler):
+    """
+    检查昵称
+    不可重名
+    不可为空
+    不可为非法字符
+    """
+    def post(self):
+        nickname = self.get_argument('nickname')
+
+        # user_nickname = USER_NICKNAME.format(nickname=nickname)
+        nickname_set = NICKNAME
+
+        if len(nickname) <= 0:
+            self.write_json(1, "昵称不能为空" )
+
+        if self.db.r.sismember(nickname_set, nickname):
+            self.write_json(1, "昵称已存在")
+        else:
+            self.write_json(0, "昵称不存在")
+
+class check_email(BaseHandler):
+
+    def post(self):
+        email = self.get_argument('email')
+        email_set = EMAIL
+
+        if len(email) <= 0:
+            self.write_json(1, "邮箱不能为空")
+
+        if self.db.r.sismember(email_set, email):
+            self.write_json(1, "邮箱已存在")
+        else:
+            self.write_json(0, "邮箱不存在")
+
+        self.write_json(200)

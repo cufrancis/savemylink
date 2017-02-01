@@ -9,9 +9,11 @@ from tornado import template
 from lib.DB import db
 from lib.Account import Account
 from lib.define import *
-from lib.util import ago
+from lib.util.convert import ago
 import os
 from ..config import config
+from lib.util.json import dumps
+
 
 AJAX_HEADERS = ('X_PJAX', 'X-Requested-With',)
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -33,6 +35,9 @@ class BaseHandler(tornado.web.RequestHandler):
                 loader = RequestHandler._template_loaders[template_path]
         return loader
 
+    def render(self, template_name, **kwargs):
+        return self.render_pjax(template_name, **kwargs)
+
     def render_pjax(self, template_name, **kwargs):
         print(self.get_template_namespace())
         if not self.is_ajax:
@@ -48,6 +53,15 @@ class BaseHandler(tornado.web.RequestHandler):
         else:
             print(template_name)
             self.write(self.render_string(template_name, **kwargs))
+
+    # write json
+    # when you want use api
+    def write_json(self, data, msg='success.', status_code=200):
+        self.finish(dumps({
+            'code': status_code,
+            'msg': msg,
+            'data': data
+        }))
 
     def initialize(self):
         self.is_ajax = False
@@ -71,10 +85,12 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         uid = self.get_secure_cookie('uid')
         if Account.isLogin(uid):
-            try:
-                return Account(uid)
-            except:
-                return None
+            return Account(uid)
+        else:
+            # clear cookie and return None Accont object
+            self.clear_cookie('uid')
+            return None
+            #return Account(0)
 
     def getUser(self):
         uid = self.get_secure_cookie('uid')
@@ -82,7 +98,7 @@ class BaseHandler(tornado.web.RequestHandler):
             try:
                 return Account(uid)
             except:
-                return None
+                return Account(0)
 
     def get_template_namespace(self):
         namespace = dict(

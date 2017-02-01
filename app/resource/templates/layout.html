@@ -1,62 +1,129 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="llnhhy">
+    <meta name="copyright" content="2017 www.llnhhy.com" />
+    {# <link rel="icon" href="../../favicon.ico">#}
     {% block seo %}
     {% end %}
 
-    <meta name="author" content="Cufrancis" />
-    <meta name="copyright" content="2016 www.cufrancis.com" />
-
     <title>{{title}}</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+    <!-- Bootstrap core CSS -->
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <style>
-        body {
-            font-family: 'Lato';
-        }
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{ static_url('css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
 
-        .fa-btn {
-            margin-right: 6px;
-        }
-        .reply {
-            text-indent:50px;
-        }
-    </style>
-    {% block css %}
-    {% end %}
-</head>
-<body>
-    <div class="container" id="pjax-container">
+    <!-- Custom styles for this template -->
+    <link href="{{static_url('css/sticky-footer-navbar.css')}}" rel="stylesheet">
 
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="{{static_url('js/ie-emulation-modes-warning.js')}}"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% block css %}{% end %}
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Save my link</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
+            {% if current_user == None %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">register</a></li>
+            {% else %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{current_user.name}} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href=""><span class="glyphicon glyphicon-user" aria-hidden="true" style="right:5px"></span>我的主页</a></li>
+                        <li><a href=""><span class="glyphicon glyphicon-cog" aria-hidden="true" style="right:5px"></span>设置</a></li>
+                        <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true" style="right:5px"></span>退出</a></li>
+                    </ul>
+                </li>
+            {% end %}
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <!-- Begin page content -->
+    <div class="container pjax-container">
+      {# <div class="page-header">
+        <h1>Sticky footer with fixed navbar</h1>
+      </div>
+      <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>body &gt; .container</code>.</p>
+      <p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>#}
       {% block content %}
       {% end %}
-
-
-      <footer id="footer">
-            {% block footer %}
-            {% end %}
-      </footer>
     </div>
 
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
 
-    <!-- JavaScripts -->
-    <script src="http://pjax.herokuapp.com/jquery.js"></script>
-    <script src="http://pjax.herokuapp.com/jquery.pjax.js" ></script>
 
-    <script type="text/javascript">
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    {# <script src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>#}
+    <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+
+    {# <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>#}
+    <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{static_url('js/ie10-viewport-bug-workaround.js')}}"></script>
+    <script src="//cdn.bootcss.com/jquery.pjax/1.9.6/jquery.pjax.min.js" ></script>
+    {# <script type="text/javascript">
       $(function(){
         // pjax
-        $(document).pjax('a', '#pjax-container')
+        $(document).pjax('a', '#pjax-content')
       })
-    </script>
+    </script>#}
+    {% block script %}
+    {% end %}
 
-  {% block script %}
-  {% end %}
-
-</body>
+  </body>
 </html>

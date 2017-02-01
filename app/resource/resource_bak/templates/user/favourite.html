@@ -1,0 +1,12 @@
+{%block content%}
+
+{% if user != None %}
+    {% for f in user.favourites() %}
+        <a href="/favourite/{{f.fid}}">{{f.name}}</a><br />
+    {% end %}
+    <hr />
+{% end %}
+
+<a href="/favourite/create">Create favourite</a>
+
+{%end%}

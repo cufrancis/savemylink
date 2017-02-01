@@ -1,0 +1,11 @@
+.nav {
+    padding-top: 10px;
+    padding-bottom: 0.5em;
+    /*border-style:solid;*/
+    border-bottom-style:dotted;
+}
+
+.site-title {
+    font-size: 20px;
+    margin-right: 20px;
+}

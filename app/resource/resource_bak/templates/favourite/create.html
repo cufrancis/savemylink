@@ -1,0 +1,18 @@
+
+{%block content %}
+    <a href="/">Index</a>
+    <h1>create favourite</h1>
+
+    <form method="POST">
+        {% raw xsrf_form_html() %}
+        name:
+        <input type="text" name="name" value="" /><br />
+        <input type="submit" value="create">
+    </form>
+
+
+    {%block footer%}
+    <br />
+    <a href="/">Index</a>
+    {%end%}
+{%end%}

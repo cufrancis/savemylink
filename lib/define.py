@@ -12,6 +12,19 @@ ACCOUNT_AVATARS = 'account:{uid}:avatars'
 ACCOUNT_USER = 'account:{uid}' # hash
 ACCOUNT_LINK = 'account:{uid}:link' #Set
 
+# User (New action)
+USER_NICKNAME = 'user:{nickname}' # string key
+NICKNAME = 'nickname' # set 存所有nickname， 查重用
+EMAIL = 'email' # set 存所有email，查重用
+
+
+
+# user favourite
+ACCOUNT_FAVOURITE = 'account:{uid}:favourite' # set
+FAVOURITE_INFO = 'favourite:{fid}:info' # hash
+FAVOURITE = 'favourite:{fid}' # set, add link id
+FAVOURITE_COUNT = 'favourite:count' # string incr id
+
 SESSION_USER = 'session:{uid}' # String
 
 # Link

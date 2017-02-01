@@ -1,4 +1,5 @@
 import os
+from .module import remodal
 
 config = dict(
     # 调试模式
@@ -34,6 +35,8 @@ config = dict(
     # {"messageModule":messageModule,
     # },
 
-    title = 'Save my link'
+    title = 'Save my link',
+    # Modeule UI
+    ui_modules=[remodal]
 
 )

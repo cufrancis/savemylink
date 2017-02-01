@@ -8,5 +8,13 @@ class Error(Exception):
     pass
 
 class LoginError(Error):
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, message):
+        self.message = message
+
+class PermissionError(Error):
+    def __init__(self, message):
+        self.message = message
+
+class NotExistsError(Error):
+    def __init__(self, message):
+        self.message = message

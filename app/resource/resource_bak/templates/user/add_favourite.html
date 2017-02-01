@@ -1,0 +1,8 @@
+{% block content %}
+
+Do you want link({{link.title}}) add to which Favourite?<br />
+
+{%for k in favourites %}
+    <a href="/favourite/{{k.fid}}/addlink/{{link.lid}}">{{k.name}}</a><br />
+{%end%}
+{%end%}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block seo %}
+    {% end %}
+
+    <meta name="author" content="Cufrancis" />
+    <meta name="copyright" content="2016 www.llnhhy.com" />
+
+    <title>{{title}}</title>
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="{{static_url('css/style.css')}}">
+
+
+    <style>
+        body {
+            font-family: 'Lato';
+        }
+
+        .fa-btn {
+            margin-right: 6px;
+        }
+        .reply {
+            text-indent:50px;
+        }
+        .indent {
+            text-indent: 50px;
+        }
+    </style>
+    {% block css %}
+    {% end %}
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <span class="site-title">
+                <a href="/">save my Link</a>
+            </span>
+            <nav class="site-nav">
+            </nav>
+        </div>
+
+        <div class="content"  id="pjax-content">
+            {% block content %}
+            {% end %}
+        </div>
+
+      <footer id="footer">
+            {% block footer %}
+            {% end %}
+            <center>Copyright @ llnhhy <br />llnhhy.com@gmail.com</center>
+      </footer>
+
+
+
+    <!-- JavaScripts -->
+    <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/jquery.pjax/1.9.6/jquery.pjax.min.js" ></script>
+    <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+      $(function(){
+        // pjax
+        $(document).pjax('a', '#pjax-content')
+      })
+    </script>
+
+  {% block script %}
+  {% end %}
+</div>
+
+
+</body>
+</html>

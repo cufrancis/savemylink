@@ -84,11 +84,17 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
         uid = self.get_secure_cookie('uid')
-        if Account.isLogin(uid):
-            return Account(uid)
+        # uid = int(uid)
+
+        if uid:
+            uid = int(uid)
+            if Account.isLogin(uid):
+                return Account(uid)
+            else:
+                # clear cookie and return None Accont object
+                self.clear_cookie('uid')
+                return None
         else:
-            # clear cookie and return None Accont object
-            self.clear_cookie('uid')
             return None
             #return Account(0)
 

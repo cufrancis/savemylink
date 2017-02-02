@@ -4,7 +4,7 @@
     <p>Username:<i>{{user.nickname}}</i></p>
     <p>Email: <a href="mailto:{{user.email}}">{{user.email}}</a></p>
     <p>Sex: {{user.sex}}</p>
-    {% if current_user == None %}
+    {% if current_user != None %}
         {% if current_user.get('uid') != user.uid %}
             <p>他发布的链接</p>
         {% else %}

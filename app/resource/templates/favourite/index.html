@@ -1,16 +1,22 @@
+{%extends "layout.html"%}
+
 {%block content %}
-    <a href="/">Index</a>
     <h1>Favourite</h1>
 
-    {% for n,link in enumerate(links) %}
+    <div class="favourite-info">
+        <div class="">收藏夹名称：{{favourite.name}}</div>
+        <div class="">收藏夹创建时间：{{favourite.created_at}}</div>
+        <div class="">作者：<a href="/user/{{favourite.author.uid}}">{{favourite.author.nickname}}</a></div>
+    </div>
+    <hr />
 
-        {{n+1}} <a href="{{link.url}}">{{link.title}}</a><br />
-    {% end %}
+    {% if links %}
+        {% for n,link in enumerate(links) %}
+
+            {{n+1}} <a href="{{link.url}}">{{link.title}}</a><br />
+        {% end %}
+    {% else %}
+        暂无
+    {%end%}
 
 {%end%}
-
-
-    {%block footer%}
-    <br />
-    <a href="/">Index</a>
-    {%end%}

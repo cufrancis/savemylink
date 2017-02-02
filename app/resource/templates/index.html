@@ -9,10 +9,13 @@
             {% for link in links %}
             <div class="row">
                 <div class="row col-sm-12 post-container" style="border-bottom: 1px dashed #cacaca;padding-bottom: 15px;margin-left: 18px;">
-                    <h4 class="post-title">up 0 down |
+                    <h4 class="post-title">
+                        <a lid="{{link.lid}}" id="vote_up_{{link.lid}}" class="fa fa-btn glyphicon glyphicon-thumbs-up"></a>
+                        <span id="points_{{link.lid}}">{{link.points}}</span>
+                        <a lid="{{link.lid}}" id="vote_down_{{link.lid}}" class="fa fa-btn glyphicon glyphicon-thumbs-down"></a>
                         <a href="{% raw link.url %}">{{link.title}}</a>({{link.url}})</h4>
                     <div class="meta-box">
-                        <span class="post-info"><a href="/user/{{link.author.uid}}">{{link.author.nickname}}</a> by：{{link.created_at}} | <a href="/link/{{link.lid}}">{{ len(link.comments) }} comments</a></span>
+                        <span class="post-info"><a href="/user/{{link.author.uid}}">{{link.author.nickname}}</a> by：<span id="created-at-{{link.created_at}}">{{link.created_at}}</span></a> | <a href="/link/{{link.lid}}">{{ link.num_comments }} comments</a></span>
                     </div>
                 </div>
             </div>
@@ -21,5 +24,101 @@
             No have
         {%end%}
     </div>
-
 {%end%}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+<script>
+$(document).ready(function(){
+    vote_up()
+    vote_down()
+
+    // 时间转换
+    time_conver()
+});
+
+// 从cookie 中获取xsrf
+function xsrf(name="_xsrf")
+{
+    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+
+    if(arr=document.cookie.match(reg))
+
+        return unescape(arr[2]);
+    else
+        return null;
+}
+
+function time_conver(){
+    $("[id^='created-at-']").each(function(){ // 遍历id
+        var created_at = $(this).html()
+        $(this).html(moment(moment.unix(created_at)).fromNow())
+    });
+}
+
+function vote_up(){
+    $("[id^='vote_up_']").click(function(){
+        // alert($(this).attr("lid"))
+        // var lid = $("#vote_up").attr("lid")
+        var lid = $(this).attr("lid")
+        // alert(lid)
+        // alert($("[id^='points_"+lid+"']").length)
+        $.ajax({
+            url:'/ajax/link/vote_up',
+            type:"POST",
+            data:{
+                _xsrf:xsrf(),
+                lid:lid},
+            cache:false,
+            dataType:'json',
+
+            success:function(data){
+                if (data.data.status == 0){
+                    $("[id^='points_"+lid+"']").html(data.data.points)
+                } else {
+                    // alert(data.msg)
+                    error(data.msg)
+                }
+
+            },
+            error:function(data){
+                alert("Error")
+            }
+        });
+    });
+}
+
+function vote_down(){
+    $("[id^='vote_down_']").click(function(){
+        // alert($(this).attr("lid"))
+        // var lid = $("#vote_up").attr("lid")
+        var lid = $(this).attr("lid")
+        // alert(lid)
+        // alert($("[id^='points_"+lid+"']").length)
+        $.ajax({
+            url:'/ajax/link/vote_down',
+            type:"POST",
+            data:{
+                _xsrf:xsrf(),
+                lid:lid},
+            cache:false,
+            dataType:'json',
+
+            success:function(data){
+                // alert(data.data.status)
+                if (data.data.status == 0){
+                    $("[id^='points_"+lid+"']").html(data.data.points)
+                } else {
+                    error(data.msg)
+                    // alert(data.msg)
+                }
+
+            },
+            error:function(data){
+                alert("Error")
+            }
+        });
+    });
+}
+</script>
+{% end %}

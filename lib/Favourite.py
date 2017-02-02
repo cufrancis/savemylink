@@ -12,6 +12,9 @@ class Favourite(object):
     db = db
     link_list = []
     value_dict = dict()
+    favourite_public = FAVOURITE_PUBLIC
+    favourite_count = FAVOURITE_COUNT
+
 
     def __init__(self, fid = 0):
 
@@ -23,6 +26,8 @@ class Favourite(object):
         self.favourite_info = FAVOURITE_INFO.format(fid=self.fid)
         self.favourite_count = FAVOURITE_COUNT
         self.favourite = FAVOURITE.format(fid=self.fid)
+        self.favourite_public = FAVOURITE_PUBLIC
+
 
 
     @classmethod
@@ -33,10 +38,11 @@ class Favourite(object):
         #)
         favourite_count = FAVOURITE_COUNT
 
-        fid = cls.db.r.incr(favourite_count)
+        fid = cls.db.r.incr(cls.favourite_count)
 
         favourite_info = FAVOURITE_INFO.format(fid=fid)
         cls.db.r.hmset(favourite_info, info)
+        cls.db.r.sadd(cls.favourite_public, fid)
 
         # only return fid
         # if you want add fid to account_favourite table
@@ -46,12 +52,36 @@ class Favourite(object):
         # cls.db.r.sadd(account_favourite, fid)
         return fid
 
+    @classmethod
+    def public(cls):
+        """
+        返回所有公开的收藏夹
+        """
+
+        pub = cls.db.smembers(cls.favourite_public)
+
+        result = []
+        if pub:
+            for k in pub:
+                result.append(Favourite(k))
+            return result
+        else:
+            return []
+
     @property
     def name(self):
         #favourite_info = FAVOURITE_INFO.format(fid=self.fid)
         result = self.db.r.hget(self.favourite_info, 'name')
 
         return result
+
+    @property
+    def author(self):
+        user_id = self.db.hget(self.favourite_info, 'author')
+        print(self.favourite_info)
+        if user_id:
+            from lib.Account import Account
+            return Account(user_id)
 
     @name.setter
     def name(self, value):

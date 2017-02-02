@@ -18,13 +18,14 @@ class index(BaseHandler):
     def get(self, uid):
 
         # try:
+        uid = int(uid)
         user = Account(uid)
         links = user.links()
         # except NotExistsError as e:
         #     self.write("user Not exists!")
 
-        # print(user)
-        # print(user.links())
+        print("Linkssssssssssssssssssssss")
+        print(links[0].points)
 
         self.render('user/index.html', user=user, links=links)
 
@@ -70,7 +71,8 @@ class register(BaseHandler):
             desc = '',
             image = '',
             status = 'open',
-            mobile = ''
+            mobile = '',
+            expired = 3600,
         )
         try:
             uid = Account.register(userinfo)

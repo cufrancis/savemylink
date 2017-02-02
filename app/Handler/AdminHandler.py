@@ -30,4 +30,3 @@ class link(BaseHandler):
             self.render("admin/links.html", links=links)
         except PermissionError as e:
             self.write(e.message)
-

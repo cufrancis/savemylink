@@ -39,19 +39,19 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.render_pjax(template_name, **kwargs)
 
     def render_pjax(self, template_name, **kwargs):
-        print(self.get_template_namespace())
+        # print(self.get_template_namespace())
         if not self.is_ajax:
             loader = self._get_loader()
             templates = PJAX_TEMPLATE.format(self.get_template_path(), template_name)
             namespace = self.get_template_namespace()
             namespace.update(kwargs)
-            print(templates)
-            print("Runnnnnnnnnnnnnnnnnn!!!!!!!!!!")
+            # print(templates)
+            # print("Runnnnnnnnnnnnnnnnnn!!!!!!!!!!")
             t = template.Template(templates, loader=loader)
             self.write(t.generate(**namespace))
             #self.render(tornado.template.Template(template, loader=loader).generate(**namespace))
         else:
-            print(template_name)
+            # print(template_name)
             self.write(self.render_string(template_name, **kwargs))
 
     # write json

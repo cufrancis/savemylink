@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 # coding=utf-8
 
 from lib.DB import db
@@ -19,8 +19,6 @@ LEVELS = {
     'critical':logging.CRITICAL
 }
 
-slat = 'password'
-
 class Account(object):
     db = db
 
@@ -33,59 +31,110 @@ class Account(object):
         self.uid = uid
         self.key = ACCOUNT_USER.format(uid=uid)
         self.account_key = ACCOUNT_USER.format(uid=uid)
-        #ACCOUNT_USER.format(uid=self.uid)
 
     def favourites(self):
-
+        """
+        返回用户所有的收藏夹，
+        返回列表，其中包含收藏夹对象
+        """
         account_favourite = ACCOUNT_FAVOURITE.format(uid=self.uid)
 
         tmp = self.db.smembers(account_favourite)
         result = []
-
-        #print("TMP ===============")
-        #print(tmp)
 
         for k in tmp:
             result.append(Favourite(k))
 
         return result
 
-        #print(result)
-        #result = self.db.r.hget()
-
-    # add favourite id to user favourite table
-    # fid to account:{id}:favourite|(set)
     def add_favourite(self, fid):
+        """
+        添加收藏夹id到用户收藏夹表中
+
+        操作表：
+        account:{id}:favourite|(set)
+        """
         account_favourite = ACCOUNT_FAVOURITE.format(uid=self.uid)
         self.db.r.sadd(account_favourite, fid)
 
-    def __getattr__(self, field):
-        print("Account.__getattr__.{field}".format(field=field))
-
-        attributes = ['email','mobile', 'nick_name', 'age',  'password', 'desc', 'status', 'avatar']
-
-        if field in attributes:
-#            if self._get(fied)
-            return self._get(field)
-
     def _get(self, field):
-        key = ACCOUNT_USER.format(uid=self.uid)
+        """
+        内部函数，返回用户中指定的信息
+        支持nickname, email, mobile, age, sex, password, desc, status, avatar
 
-        result = self.db.hget(key, field)
-        return result
+        返回值：
+            成功,返回相应数据
+            失败,返回0
+        """
+        result = self.db.hget(self.account_key, field)
+
+        if result:
+            return result
+        else:
+            return None
 
     def _set(self, field, value):
+        """
+        内部函数，设置用户指定的数据，
+        若要保存到数据库，还需调用save()方法
+        """
         return self.db.hset(self.key, field, value)
 
     @property
-    def nickname(self):
-        return self.db.r.hget(self.account_key, 'nickname')
+    def email(self):
+        return self._get('email')
+
+    @property
+    def mobile(self):
+        return self._get('mobile')
+
+    @property
+    def age(self):
+        return self._get('age')
 
     @property
     def sex(self):
-        return self.db.r.hget(self.account_key, 'sex')
+        return self._get('sex')
+
+    @property
+    def nickname(self):
+        return self._get('nickname')
+
+    @property
+    def sex(self):
+        return self._get('sex')
+
+    @property
+    def password(self):
+        return self._get('password')
+
+    @property
+    def desc(self):
+        return self._get('desc')
+
+    @property
+    def status(self):
+        return self._get('status')
+
+    @property
+    def expired(self):
+        """
+        获取cookie 过期时间，若数据库中无数据，则默认为3600秒
+        """
+        time = self._get('expired')
+        if time:
+            return int(time)
+        else:
+            return 3600
+
 
     def isAdmin(self):
+        """
+        检查用户是否是管理员
+
+        暂时设置id 为1的是管理员
+        这个验证功能应该拆分到auth类中，不过以后有空重构的时候再说吧
+        """
         # test admin data start
         self.db.r.sadd(ADMIN, 1)
         #test admin data end
@@ -97,7 +146,10 @@ class Account(object):
 
     @classmethod
     def login(cls, email, password):
-        print("Account.login...........")
+        """
+        登陆功能
+        为了代码不那么散，我就把登陆注册等与具体Account类无关联的操作放在了Account中，也不知道这样做好不好。。。
+        """
         account = Account()
         email = email
         password = password
@@ -125,14 +177,16 @@ class Account(object):
 
         cls.db.r.zadd(account_login, uid, 1)
         # session setting
-        cls.db.set(session, uid, 3600)
+        cls.db.set(session, uid, Account(uid).expired)
 
         return uid
 
     @classmethod
     def register(cls, userinfo):
         """
-        successful return uid, failed return 0
+        用户注册，userinfo是dict类型，存储用户的所有信息
+
+        成功返回用户uid，失败返回0
         """
         account_email = ACCOUNT_EMAIL.format(email=userinfo.get('email'))
         account_count = ACCOUNT_COUNT
@@ -159,7 +213,7 @@ class Account(object):
     @classmethod
     def isLogin(cls, uid=0):
         """
-        is login
+        用户是否登陆
         account:login:set (zset)
         check session:{id}
         """
@@ -170,6 +224,9 @@ class Account(object):
             return False
 
     def logout(self):
+        """
+        用户退出
+        """
         account_login = ACCOUNT_LOGIN
         session_user = SESSION_USER.format(uid=self.uid)
 
@@ -181,33 +238,20 @@ class Account(object):
             return False
 
     def links(self):
+        """
+        用户发布的所有链接
+
+        成功返回列表，内含Link实例，失败返回空列表
+        """
         result = self.db.r.smembers(ACCOUNT_LINK.format(uid=self.uid))
         result = list(result)
         links = []
-        tmp = []
         for k in result:
-            tmp.append(bytes.decode(k))
-            links.append(convert(self.db.r.hgetall(LINK.format(lid=bytes.decode(k)))))
+            from lib.Link import Link
+            # links.append(convert(self.db.r.hgetall(LINK.format(lid=bytes.decode(k)))))
+            links.append(Link(k))
 
         return links
-
-    def _handle(self, field, value=None):
-
-        if value is None:
-            result = self._get(field)
-            result = bytes.decode(result)
-            return result
-        else:
-            return self._set(field, value)
-
-    def mobile(self, value=None):
-        return self._handle('mobile', value)
-
-#    def password(self, value=None):
-#        if value is not None:
-#            self._set('password', value)
-#        else:
-#            return self._get('password')
 
     def avatars(self, value=None):
         key = ACCOUNT_AVATARS.format(id=self.id)
@@ -216,8 +260,3 @@ class Account(object):
             return self.db.r.smembers(key)
         else:
             return self.db.r.sadd(key, value)
-
-
-
-def test_aswer():
-    assert(Account(1).nickname)

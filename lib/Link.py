@@ -13,8 +13,15 @@ class Link(object):
     db = db
 
     def __init__(self, lid=0, db=db):
-        self.lid = lid
+        # self.lid = bytes.decode(lid)
+        if isinstance(lid, bytes):
+            self.lid = bytes.decode(lid)
+        else:
+            self.lid = lid
+
+        # self.lid = lid
         self.db = db
+        self.link_key = LINK.format(lid=self.lid)
 
     @classmethod
     def create(self, link):
@@ -93,6 +100,10 @@ class Link(object):
         info.setdefault('title', None)
         info.setdefault('author', None)
         info.setdefault('updated_at', None)
+        # info.setdefault('vote_up', 0)
+        # info.setdefault('vote_down', 0)
+        # points , vote_up and vote_down chage this value
+        info.setdefault('points', 0)
 
         cls.db.r.hmset(LINK.format(lid=lid), info)
         cls.db.r.sadd(LINK_ALL, lid)
@@ -100,7 +111,6 @@ class Link(object):
         cls.db.r.zadd(LINK_SORT_BYVISIT.format(lid=lid),lid, 0)
         cls.db.r.sadd(ACCOUNT_LINK.format(uid=info['author']), lid)
 
-#        print(link_id)
         return lid
 
     def _num_comments(self):
@@ -110,7 +120,8 @@ class Link(object):
 
 
     def __getattr__(self, field):
-        attribute = ['icon', 'url', 'title', 'created_at', 'updated_at']
+        # attribute = ['icon', 'url', 'title', 'created_at', 'updated_at']
+        attribute = []
 
         action = ['comments', 'author']
 
@@ -128,6 +139,34 @@ class Link(object):
             return self._get('author')
         else:
             return None
+
+    @property
+    def title(self):
+        # return self.link_key
+        return self.db.hget(self.link_key, 'title')
+
+    @property
+    def url(self):
+        return self.db.hget(self.link_key, 'url')
+
+    @property
+    def created_at(self):
+        return self.db.hget(self.link_key, 'created_at')
+
+    @property
+    def points(self):
+        result = self.db.hget(self.link_key, 'points')
+
+        if result:
+            return result
+        else:
+            return 0
+
+    def vote_up(self, incr=1):
+        return self.db.r.hincrby(self.link_key, 'points', incr)
+
+    def vote_down(self, incr=-1):
+        return self.db.r.hincrby(self.link_key, 'points', incr)
 
     def _get(self, field):
         key = LINK.format(lid=self.lid)

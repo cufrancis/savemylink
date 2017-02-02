@@ -6,6 +6,14 @@ import tornado.web
 
 from lib.Favourite import Favourite
 from lib.Link import Link
+import time
+
+class all(BaseHandler):
+
+    def get(self):
+        public  = Favourite.public()
+        print(public)
+        self.render("favourite/all.html", public=public)
 
 class index(BaseHandler):
     def get(self, fid):
@@ -14,12 +22,13 @@ class index(BaseHandler):
         favourite = Favourite(fid)
         #links = favourite.links() # get all links in favourite
         links = []
+        print(favourite.author)
 
         for k in favourite.links():
             links.append(Link(k))
 
         print(links)
-        self.render("favourite/index.html", links = links)
+        self.render("favourite/index.html", favourite=favourite,links = links)
 
 class create(BaseHandler):
 
@@ -30,7 +39,9 @@ class create(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         info = dict(
-            name = self.get_argument('name')
+            name = self.get_argument('name'),
+            created_at = int(time.time()),
+            author = int(self.current_user.uid),
         )
 
         try:

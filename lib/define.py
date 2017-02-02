@@ -19,11 +19,12 @@ EMAIL = 'email' # set 存所有email，查重用
 
 
 
-# user favourite
-ACCOUNT_FAVOURITE = 'account:{uid}:favourite' # set
-FAVOURITE_INFO = 'favourite:{fid}:info' # hash
-FAVOURITE = 'favourite:{fid}' # set, add link id
-FAVOURITE_COUNT = 'favourite:count' # string incr id
+# 用户收藏夹
+ACCOUNT_FAVOURITE = 'account:{uid}:favourite' # set，存放用户所拥有的收藏夹的id
+FAVOURITE_INFO = 'favourite:{fid}:info' # hash， 存放收藏夹的所有信息，如收藏夹名字(name)，收藏夹创建日期(created_at), 收藏夹作者(author)
+FAVOURITE = 'favourite:{fid}' # set, 存放收藏夹所包含的link id
+FAVOURITE_COUNT = 'favourite:count' # string 自增favourite id
+FAVOURITE_PUBLIC = 'favourite:public' # set, 存放公开的收藏夹id，用户新建收藏夹时默认公开
 
 SESSION_USER = 'session:{uid}' # String
 

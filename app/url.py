@@ -23,6 +23,7 @@ url = [
     (r'/user/favourite/add/(\d+)', User.add_favourite),
 
     # favourite
+    (r'/favourite', Favourite.all),
     (r'/favourite/create', Favourite.create),
     (r'/favourite/(\d+)', Favourite.index),
     (r'/favourite/(\d+)/addlink/(\d+)', Favourite.addlink),
@@ -31,6 +32,8 @@ url = [
     (r'/link/(\d+)', Link.index),
     (r'/link/add', Link.create),
     (r'/link/delete/(\d+)', Link.delete),
+    (r'/link/(\d+)/vote_up', Link.vote_up),
+    (r'/link/(\d+)/vote_down', Link.vote_down),
 
     # comment
     (r'/comment/(\d+)/reply', Comment.reply),
@@ -46,6 +49,11 @@ url = [
     (r'/link/check/url', Link.check_url),
 
     (r'/ajax/get/title', Link.get_title),
+    (r'/ajax/link/vote_up', Link.vote_up),
+    (r'/ajax/link/vote_down', Link.vote_down),
+
+    # 获取链接信息的api
+    (r'/api/link',Link.api_link),
 
     # admin.link
     #(r'/admin/link/(\d+)', Link.index)

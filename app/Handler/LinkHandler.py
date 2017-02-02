@@ -129,9 +129,40 @@ class get_title(BaseHandler):
         else:
             self.write_json(soup.title.string)
 
+class vote_up(BaseHandler):
+    def post(self):
+        if self.current_user:
+            lid = int(self.get_argument('lid'))
+            link = Link(lid)
+            link.vote_up()
+            # print(link.points)
+            # data = {
+            #     "points":link.points
+            # }
+            self.write_json(dict(status=0, points=link.points))
+        else:
+            self.write_json(dict(status=1), "未登陆")
 
-        # print(soup.title.string)
-        # if len(soup.title.string) > 0:
-        #     self.write_json(soup.title.string)
-        # else:
-        #     self.write_json('')
+class vote_down(BaseHandler):
+    def post(self):
+        # data = dict()
+
+        if self.current_user:
+            lid = int(self.get_argument('lid'))
+            link = Link(lid)
+            link.vote_down()
+            # data = {
+            #     'status':0
+            #     "points":link.points
+            # }
+            self.write_json(dict(status=0, points=link.points))
+        else:
+            self.write_json(dict(status=1), "未登陆！")
+            # data['status'] = 1
+
+        # self.write_json(data)
+
+class api_link(BaseHandler):
+
+    def get(self):
+        pass

@@ -24,8 +24,6 @@ class index(BaseHandler):
         # except NotExistsError as e:
         #     self.write("user Not exists!")
 
-        print("Linkssssssssssssssssssssss")
-        print(links[0].points)
 
         self.render('user/index.html', user=user, links=links)
 

@@ -1,2 +1,6 @@
 dump.rdb
 appendonly.aof
+*.[oa]
+*~
+*.pyc
+__pycache__/

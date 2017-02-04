@@ -6,6 +6,11 @@
         {% raw xsrf_form_html() %}
         name:
         <input type="text" name="name" value="" /><br />
+        是否公开：
+        <select name="public">
+            <option value=0>不公开</options>
+            <option value=1>公开</option>
+        </select>
         <input type="submit" value="create">
     </form>
 

@@ -42,7 +42,9 @@ class Favourite(object):
 
         favourite_info = FAVOURITE_INFO.format(fid=fid)
         cls.db.r.hmset(favourite_info, info)
-        cls.db.r.sadd(cls.favourite_public, fid)
+
+        if info['public']:
+            cls.db.r.sadd(cls.favourite_public, fid)
 
         # only return fid
         # if you want add fid to account_favourite table
@@ -58,6 +60,7 @@ class Favourite(object):
         返回所有公开的收藏夹
         """
 
+        # 在这里可以做分页
         pub = cls.db.smembers(cls.favourite_public)
 
         result = []
@@ -67,6 +70,11 @@ class Favourite(object):
             return result
         else:
             return []
+
+    @property
+    def isPublic(self):
+        public = self.db.r.sismembers(self.favourite_public, self.fid)
+        return public
 
     @property
     def name(self):
@@ -97,6 +105,8 @@ class Favourite(object):
     @created_at.setter
     def created_at(self, value):
         self.value_dict['created_at'] = value
+
+
 
     # add linkid to favourite , if not run save , the data is in buffer
     def addlink(self, lid):

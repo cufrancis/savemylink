@@ -12,6 +12,7 @@ class all(BaseHandler):
 
     def get(self):
         public  = Favourite.public()
+
         print(public)
         self.render("favourite/all.html", public=public)
 
@@ -40,6 +41,7 @@ class create(BaseHandler):
     def post(self):
         info = dict(
             name = self.get_argument('name'),
+            public = int(self.get_argument('public')), # 是否public
             created_at = int(time.time()),
             author = int(self.current_user.uid),
         )
@@ -47,9 +49,10 @@ class create(BaseHandler):
         try:
             fid = Favourite.create(info)
             self.user.add_favourite(fid)
-            self.redirect('/user/'+self.user.uid+'/favourite')
         except:
             self.write("add favourite Error")
+        else:
+            self.redirect('/user/{uid}/favourite'.format(uid=self.user.uid))
 
 class addlink(BaseHandler):
     @tornado.web.authenticated

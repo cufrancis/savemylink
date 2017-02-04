@@ -1,0 +1,11 @@
+/usr/bin/python3: can't find '__main__' module in '/home/cufrancis/Documents/python/savemylink'
+/usr/bin/python3: can't find '__main__' module in '/home/cufrancis/Documents/python/savemylink'
+/usr/bin/python3: can't find '__main__' module in '/home/cufrancis/Documents/python/savemylink'
+/usr/bin/python3: can't find '__main__' module in '/home/cufrancis/Documents/python/savemylink'
+[I 170202 21:08:01 web:1971] 302 GET /link/add (127.0.0.1) 2.26ms
+[I 170202 21:08:18 web:1971] 200 POST /register (127.0.0.1) 7.30ms
+[I 170202 21:08:46 web:1971] 200 POST /ajax/get/title (127.0.0.1) 822.37ms
+[I 170202 21:09:18 web:1971] 200 POST /link/check/url (127.0.0.1) 2.73ms
+[I 170202 21:09:27 web:1971] 200 GET / (127.0.0.1) 21.77ms
+[I 170202 21:09:43 web:1971] 200 POST /link/check/url (127.0.0.1) 2.12ms
+[I 170202 21:09:58 web:1971] 200 POST /link/check/url (127.0.0.1) 8.16ms

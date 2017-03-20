@@ -63,7 +63,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{current_user.nickname}} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/user/{{current_user.uid}}"><span class="glyphicon glyphicon-user" aria-hidden="true" style="right:5px"></span>我的主页</a></li>
-                        <li><a href=""><span class="glyphicon glyphicon-cog" aria-hidden="true" style="right:5px"></span>设置</a></li>
+                        <li><a href="/user/setting"><span class="glyphicon glyphicon-cog" aria-hidden="true" style="right:5px"></span>设置</a></li>
                         <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true" style="right:5px"></span>退出</a></li>
                         {% if current_user.isAdmin() %}
                             <li><a href="/admin">Admin</a></li>
@@ -87,7 +87,7 @@
 
     <footer class="footer">
       <div class="container copyright" style="font-size:13px">
-        <p class="text-muted text-center">Copyright © 2016-2017 <a href="mailto:llnhhy.com@gmail.com">llnhhy</a> . 当前呈现版本 1.0.0<br />
+        <p class="text-muted text-center">Copyright © 2017 <a href="mailto:xiaojieluoff@gmail.com">LuoXiaojie</a> . 当前呈现版本 1.0.0<br />
         </p>
       </div>
     </footer>

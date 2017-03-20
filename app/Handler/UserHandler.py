@@ -35,8 +35,8 @@ class login(BaseHandler):
         email = self.get_argument('mobile')
         password = self.get_argument('password')
 
-        print("email")
-        print(email)
+        # print("email")
+        # print(email)
 
         try:
             uid = Account.login(email, password)
@@ -154,3 +154,19 @@ class check_email(BaseHandler):
             self.write_json(0, "邮箱不存在")
 
         self.write_json(200)
+
+class setting(BaseHandler):
+
+    @tornado.web.authenticated
+    def get(self):
+        self.render('user/settings.html')
+
+    @tornado.web.authenticated
+    def post(self):
+        tmp = self.request.arguments
+        data = dict()
+        for k, v in tmp.items():
+            data[k] = bytes.decode(v[0])
+            # print(v[0])
+        # print(data)
+        print(self.current_user.update(data))

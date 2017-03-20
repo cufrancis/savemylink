@@ -1,15 +1,27 @@
  #!/usr/bin/env python
 # coding=utf-8
+#
+# import sys
+# sys.path.append("../../../")
 
-from lib.DB import db
 import hashlib
 import time
-from lib.util.convert import convert
-from lib.Error import LoginError
-
-from lib.define import *
-from lib.Favourite import Favourite
 import logging
+
+
+try:
+    from lib.DB import db
+    from lib.util.convert import convert
+    from lib.Error import LoginError
+    from lib.define import *
+    from lib.Favourite import Favourite
+except:
+    from DB import db
+    from util.convert import convert
+    from Error import LoginError
+    from define import *
+    from Favourite import Favourite
+
 
 LEVELS = {
     'debug':logging.DEBUG,
@@ -19,13 +31,15 @@ LEVELS = {
     'critical':logging.CRITICAL
 }
 
+
 class Account(object):
     db = db
+    userinfo = {}
 
     def __init__(self, uid=0):
 
-        #if not isinstance(uid, int):
-        #    raise TypeError('Bad operand type')
+        if not isinstance(uid, int):
+           raise TypeError('Bad operand type')
 
         self.db = db
         self.uid = uid
@@ -57,21 +71,33 @@ class Account(object):
         account_favourite = ACCOUNT_FAVOURITE.format(uid=self.uid)
         self.db.r.sadd(account_favourite, fid)
 
-    def _get(self, field):
+    def _get(self, field, default=None):
         """
+        field:
+            查询的key
+        default:
+            值不存在时返回的默认值
+
         内部函数，返回用户中指定的信息
         支持nickname, email, mobile, age, sex, password, desc, status, avatar
 
         返回值：
             成功,返回相应数据
-            失败,返回0
+            失败,返回{default}
         """
-        result = self.db.hget(self.account_key, field)
+        # result = self.db.hget(self.account_key, field)
+        # return result
 
-        if result:
-            return result
+        if field in self.userinfo:
+            return self.userinfo[field]
         else:
-            return None
+            result = self.db.hget(self.account_key, field)
+            return result if result else default
+
+        # if result:
+        #     return result
+        # else:
+        #     return None
 
     def _set(self, field, value):
         """
@@ -83,6 +109,11 @@ class Account(object):
     @property
     def email(self):
         return self._get('email')
+        # if 'email' in self.userinfo:
+        #     return self.userinfo['email']
+        # else:
+        #     email = self._get('email')
+        #     return email if email else ''
 
     @property
     def mobile(self):
@@ -90,19 +121,31 @@ class Account(object):
 
     @property
     def age(self):
-        return self._get('age')
+        return self._get('age', 0)
 
     @property
     def sex(self):
         return self._get('sex')
+        # if 'sex' in self.userinfo:
+        #     return self.userinfo['sex']
+        # else:
+        #     sex = self._get('sex')
+        #     return sex if sex else ''
 
     @property
     def nickname(self):
+        """
+        返回用户的昵称
+        先检查用户的key是否被修改过
+        若修改过，返回修改过的值，否则从数据库中取出
+        """
+        # key = 'nickname'
         return self._get('nickname')
 
-    @property
-    def sex(self):
-        return self._get('sex')
+    @nickname.setter
+    def nickname(self, value):
+        self.userinfo['nickname'] = value
+        return self.nickname
 
     @property
     def password(self):
@@ -127,7 +170,6 @@ class Account(object):
         else:
             return 3600
 
-
     def isAdmin(self):
         """
         检查用户是否是管理员
@@ -137,7 +179,7 @@ class Account(object):
         """
         # test admin data start
         self.db.r.sadd(ADMIN, 1)
-        #test admin data end
+        # test admin data end
 
         if self.db.r.sismember(ADMIN, self.uid):
             return True
@@ -150,7 +192,7 @@ class Account(object):
         登陆功能
         为了代码不那么散，我就把登陆注册等与具体Account类无关联的操作放在了Account中，也不知道这样做好不好。。。
         """
-        account = Account()
+        # account = Account()
         email = email
         password = password
 
@@ -163,7 +205,7 @@ class Account(object):
         if cls.db.r.exists(account_email) is False:
             raise LoginError("Email does not exists!")
 
-        uid = cls.db.get(account_email)
+        uid = int(cls.db.get(account_email))
         account_user = ACCOUNT_USER.format(uid=uid)
         if cls.db.hget(account_user, 'password') != password:
             raise LoginError("Incorrect passord!")
@@ -260,3 +302,79 @@ class Account(object):
             return self.db.r.smembers(key)
         else:
             return self.db.r.sadd(key, value)
+
+    def update(self, data):
+        """
+        将修改后的数据写入数据库
+        与save方法的区别是update只写入被修改的数据
+        """
+        account_user = ACCOUNT_USER.format(uid=self.uid)
+        user = {
+            'uid':self.uid,
+            'email':self.email,
+            'nickname':self.nickname,
+            'password':self.password,
+            'sex':self.sex,
+            'age':self.age,
+            'desc':self.desc,
+            'status':self.status,
+            'mobile':self.mobile,
+            'expired':self.expired,
+        }
+        # 字典推导式,取出data 与 user 的交集,并生成新字典
+        info = {key:data[key] for key in data.keys() & user.keys()}
+        print(info)
+        result = self.db.r.hmset(account_user, info)
+        return result
+
+    def save(self):
+        """
+        将当前的用户类所有信息写入数据库中
+        先从类中提取所有信息，组合数据，然后依次写入数据库
+        保存所有数据
+        """
+        user = {
+            'uid':self.uid,
+            'email':self.email,
+            'nickname':self.nickname,
+            'password':self.password,
+            'sex':self.sex,
+            'age':self.age,
+            'desc':self.desc,
+            'status':self.status,
+            'mobile':self.mobile,
+            'expired':self.expired,
+        }
+        if user['uid'] == 0: raise TypeError("uid 不能为0")
+
+        account_email = Account_EMAIL.format(email=userinfo['email'])
+        nickname_set = NICKNAME
+        email_set = EMAIL
+        if self.db.r.exists(account_email) is True:
+            print(user)
+        # account_email = ACCOUNT_EMAIL.format(email=userinfo.get('email'))
+        # account_count = ACCOUNT_COUNT
+        # nickname_set = NICKNAME
+        # email_set = EMAIL
+        # uid = 0
+        #
+        # if cls.db.r.exists(account_email) is True:
+        #     raise LoginError("email is exists!")
+        #
+        # uid = cls.db.r.incr(account_count)
+        #
+        # account_userlist = ACCOUNT_USERLIST
+        # account_user = ACCOUNT_USER.format(uid=uid)
+        #
+        # cls.db.r.set(account_email, uid)
+        # cls.db.r.sadd(account_userlist, uid)
+        # cls.db.r.hmset(account_user, userinfo)
+        # cls.db.r.sadd(nickname_set, userinfo.get('nickname'))
+        # cls.db.r.sadd(email_set, userinfo.get('email'))
+        # return self.userinfo
+
+if __name__ == '__main__':
+    from DB import db
+    user = Account()
+    user.nickname = 10;
+    user.save()

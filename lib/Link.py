@@ -136,7 +136,7 @@ class Link(object):
         elif field == 'author':
             return self._author()
         elif field == 'author_id':
-            return self._get('author')
+            return int(self._get('author'))
         else:
             return None
 

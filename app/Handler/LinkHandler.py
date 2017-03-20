@@ -125,7 +125,7 @@ class get_title(BaseHandler):
             r = requests.get(url, timeout=2)
             soup = BeautifulSoup(r.text,"html.parser")
         except:
-            self.write_json("")
+            self.write_json("None")
         else:
             self.write_json(soup.title.string)
 

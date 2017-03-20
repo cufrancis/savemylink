@@ -20,6 +20,8 @@ url = [
     (r'/user/(\d+)', User.index),
     (r'/user/(\d+)/favourite', User.favourite),
 
+    (r'/user/setting', User.setting),
+
     (r'/user/favourite/add/(\d+)', User.add_favourite),
 
     # favourite

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
+
 import tornado.ioloop
 import tornado.web
-import logging
-import yaml
+# import logging
+# import yaml
 
-import app.Handler.IndexHandler as Index
-import app.Handler.UserHandler as User
+# import app.Handler.IndexHandler as Index
+# import app.Handler.UserHandler as User
 
 from app.url import url
 from app.config import config
@@ -15,9 +16,10 @@ import tornado.httpserver
 
 define("port", default=8888, help="run on the given port", type=int)
 
+
 def make_app():
     return tornado.web.Application(
-        handlers = url,
+        handlers=url,
         **config
     )
 

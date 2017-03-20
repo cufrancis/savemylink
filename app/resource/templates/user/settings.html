@@ -1,0 +1,10 @@
+{% block content %}
+    <form method="POST">
+        {% raw xsrf_form_html() %}
+        昵称:<input type="text" name="username" value="{{current_user.nickname}}"><br />
+        年龄: <input type="int" name="age" value="{{current_user.age}}"> <br />
+        desc: <textarea cows=400 rows=8>{{current_user.desc}}</textarea>
+
+        <input type="submit" value="提交"/>
+    </form>
+{% end %}

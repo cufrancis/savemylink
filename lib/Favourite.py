@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-#import sys
-#sys.path.append("../../../")
-
-from lib.DB import db
-from lib.define import *
+try:
+    from lib.DB import db
+    from lib.define import *
+except:
+    from DB import db
+    from define import *
 
 class Favourite(object):
 
@@ -85,8 +86,9 @@ class Favourite(object):
 
     @property
     def author(self):
-        user_id = self.db.hget(self.favourite_info, 'author')
-        print(self.favourite_info)
+        user_id = int(self.db.hget(self.favourite_info, 'author'))
+        # print(self.db.r.hgetall(self.favourite_info))
+        # print(type(user_id))
         if user_id:
             from lib.Account import Account
             return Account(user_id)

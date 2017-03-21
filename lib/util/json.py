@@ -4,7 +4,6 @@ import calendar
 import datetime
 import bson
 from bson.objectid import ObjectId
-from bson import SON
 from bson.py3compat import string_type
 
 json_lib = True

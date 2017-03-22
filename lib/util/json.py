@@ -3,7 +3,7 @@
 import calendar
 import datetime
 import bson
-from bson import SON
+from bson.son import SON
 from bson.objectid import ObjectId
 from bson.py3compat import string_type
 

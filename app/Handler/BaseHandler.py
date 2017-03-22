@@ -12,7 +12,8 @@ from lib.define import *
 from lib.util.convert import ago
 import os
 from ..config import config
-from lib.util.json import dumps
+# from lib.util.json import dumps
+from json import dumps
 
 
 AJAX_HEADERS = ('X_PJAX', 'X-Requested-With',)

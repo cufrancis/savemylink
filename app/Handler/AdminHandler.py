@@ -6,8 +6,8 @@ sys.path.append("../../../")
 
 from app.Handler.BaseHandler import BaseHandler
 import tornado.web
-from lib.Error import PermissionError
-from lib.Link import Link
+from module.Error import PermissionError
+from module.Link import Link
 
 class index(BaseHandler):
 

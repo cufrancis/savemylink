@@ -8,12 +8,10 @@ sys.path.append("../../../")
 from app.Handler.BaseHandler import BaseHandler
 import tornado.web
 
-from lib.DB import db
-from lib.Link import Link
+from module import db, Link, Account
 import time
-from lib.define import *
-from lib.Account import Account
-from lib.Error import PermissionError
+from module.define import *
+from module.Error import PermissionError
 
 class index(BaseHandler):
     def get(self, lid):

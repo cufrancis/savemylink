@@ -7,10 +7,8 @@ sys.path.append("../../../")
 from app.Handler.BaseHandler import BaseHandler
 import tornado.web
 
-from lib.DB import db
-from lib.Comment import Comment
-from lib.Link import Link
-from lib.define import *
+from module import db, Comment, Link
+from module.define import *
 import time
 
 class reply(BaseHandler):

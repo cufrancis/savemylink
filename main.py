@@ -3,11 +3,6 @@
 
 import tornado.ioloop
 import tornado.web
-# import logging
-# import yaml
-
-# import app.Handler.IndexHandler as Index
-# import app.Handler.UserHandler as User
 
 from app.url import url
 from app.config import config
@@ -29,6 +24,3 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(apps)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
-
-    # apps.listen(8888)
-    # tornado.ioloop.IOLoop.current().start()

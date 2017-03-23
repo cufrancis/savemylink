@@ -4,8 +4,7 @@
 from app.Handler.BaseHandler import BaseHandler
 import tornado.web
 
-from lib.Favourite import Favourite
-from lib.Link import Link
+from module import Favourite, Link
 import time
 
 class all(BaseHandler):

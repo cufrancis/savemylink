@@ -6,10 +6,10 @@ import tornado.ioloop
 from tornado.web import RequestHandler
 from tornado import template
 
-from lib.DB import db
-from lib.Account import Account
-from lib.define import *
-from lib.util.convert import ago
+from module.DB import db
+from module import Account
+from module.define import *
+from module.util.convert import ago
 import os
 from ..config import config
 # from lib.util.json import dumps
